@@ -1,11 +1,11 @@
-from datetime import datetime
 from sqlalchemy import String, Integer, Boolean, ForeignKey, DateTime, func, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.models.mixins import TimestampMixin
 from app.core.database import Base
 
 
-class Venue(Base):
+class Venue(Base, TimestampMixin):
     __tablename__ = "venues"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
@@ -20,10 +20,6 @@ class Venue(Base):
     capacity: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=text("CURRENT_TIMESTAMP")
-    )
 
     organization: Mapped["Organization"] = relationship(
         back_populates="venues"

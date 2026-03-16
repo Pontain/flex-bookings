@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Hittades inte{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Inte hittad</h1>
+    <p class="page-subtitle">{{ message or "Sidan kunde inte hittas." }}</p>
+</section>
+
+<div class="glass page-card">
+    <a href="/" class="btn btn-primary">Till dashboard</a>
+</div>
+{% endblock %}

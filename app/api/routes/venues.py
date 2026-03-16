@@ -1,3 +1,4 @@
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -5,6 +6,8 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.models.venue import Venue
 from app.schemas.venue import VenueCreate, VenueRead
+from app.services.availability_service import get_available_slots
+from app.schemas.availability import AvailabilitySlot
 
 router = APIRouter()
 
@@ -43,3 +46,11 @@ def get_venues(db: Session = Depends(get_db)):
         select(Venue).order_by(Venue.id)
     ).scalars().all()
     return venues
+
+@router.get("/{venue_id}/availability", response_model=list[AvailabilitySlot])
+def venue_availability(
+    venue_id: int,
+    date: date,
+    db: Session = Depends(get_db)
+):
+    return get_available_slots(db, venue_id, date)

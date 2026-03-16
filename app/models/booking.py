@@ -1,18 +1,28 @@
 from datetime import datetime
-from sqlalchemy import String, ForeignKey, DateTime, func, Text, text
+from sqlalchemy import String, ForeignKey, DateTime, Text, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.models.mixins import TimestampMixin
 from app.core.database import Base
 
 
-class Booking(Base):
+class Booking(Base, TimestampMixin):
     __tablename__ = "bookings"
+
+    __table_args__ = (
+        Index("ix_bookings_venue_time", "venue_id", "start_time", "end_time"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
 
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("organizations.id", ondelete="CASCADE"),
+        index=True,
+    )
+
     venue_id: Mapped[int] = mapped_column(
         ForeignKey("venues.id", ondelete="CASCADE"),
-        index=True
+        index=True,
     )
 
     title: Mapped[str] = mapped_column(String(120))
@@ -27,11 +37,5 @@ class Booking(Base):
 
     status: Mapped[str] = mapped_column(String(30), default="confirmed")
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=text("CURRENT_TIMESTAMP")
-    )
-
-    venue: Mapped["Venue"] = relationship(
-        back_populates="bookings"
-    )
+    venue: Mapped["Venue"] = relationship(back_populates="bookings")
+    organization: Mapped["Organization"] = relationship()

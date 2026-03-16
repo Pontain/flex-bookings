@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Dashboard</h1>
+    <p class="page-subtitle">Översikt över lokaler och bokningar</p>
+</section>
+
+<section class="stats-grid stats-grid-3">
+    <article class="stats-card">
+        <h3>Lokaler</h3>
+        <p class="stats-number">{{ venue_count }}</p>
+    </article>
+
+    <article class="stats-card">
+        <h3>Dagens bokningar</h3>
+        <p class="stats-number">{{ today_booking_count }}</p>
+    </article>
+
+    <article class="stats-card">
+        <h3>Kommande bokningar</h3>
+        <p class="stats-number">{{ upcoming_booking_count }}</p>
+    </article>
+</section>
+
+<section class="glass page-card">
+    <div class="section-header">
+        <h2>Snabbval</h2>
+    </div>
+
+    <div class="action-buttons">
+        <a href="/bookings/new" class="btn btn-primary">+ Ny bokning</a>
+        <a href="/bookings" class="btn btn-secondary">Visa bokningar</a>
+        <a href="/venues" class="btn btn-secondary">Visa lokaler</a>
+    </div>
+</section>
+{% endblock %}

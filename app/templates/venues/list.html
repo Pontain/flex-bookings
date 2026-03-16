@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Lokaler{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Lokaler</h1>
+    <p class="page-subtitle">Alla bokningsbara lokaler</p>
+</section>
+
+<section class="table-wrap">
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Namn</th>
+                <th>Adress</th>
+                <th>Kapacitet</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for venue in venues %}
+            <tr>
+                <td>{{ venue.id }}</td>
+                <td>{{ venue.name }}</td>
+                <td>{{ venue.address or "-" }}</td>
+                <td>{{ venue.capacity or "-" }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

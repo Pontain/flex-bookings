@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Bokning {{ booking.id }}{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Bokning #{{ booking.id }}</h1>
+    <p class="page-subtitle">Detaljer för vald bokning</p>
+</section>
+
+<section class="glass page-card info-card">
+    <div class="info-grid">
+        <div class="info-row">
+            <div class="label">Titel</div>
+            <div class="value">{{ booking.title }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Lokal</div>
+            <div class="value">
+                {{ booking.venue.name if booking.venue else booking.venue_id }}
+            </div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Beskrivning</div>
+            <div class="value">{{ booking.description or "-" }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Kontaktperson</div>
+            <div class="value">{{ booking.contact_name }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">E-post</div>
+            <div class="value">{{ booking.contact_email }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Start</div>
+            <div class="value">{{ booking.start_time }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Slut</div>
+            <div class="value">{{ booking.end_time }}</div>
+        </div>
+
+        <div class="info-row">
+            <div class="label">Skapad</div>
+            <div class="value">{{ booking.created_at }}</div>
+        </div>
+    </div>
+
+    <div class="form-actions" style="margin-top: 1.5rem;">
+        <a href="/bookings" class="btn btn-secondary">Tillbaka</a>
+        <a href="/bookings/new" class="btn btn-primary">Ny bokning</a>
+    </div>
+</section>
+{% endblock %}

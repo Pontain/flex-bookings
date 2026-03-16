@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Bokningar{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Bokningar</h1>
+    <p class="page-subtitle">Sök och visa aktuella bokningar</p>
+</section>
+
+<form method="get" action="/bookings" class="search-form booking-search-form">
+    <input type="text" name="title" placeholder="Sök titel" value="{{ request.query_params.get('title', '') }}">
+    <input type="text" name="venue" placeholder="Sök lokal" value="{{ request.query_params.get('venue', '') }}">
+    <button type="submit" class="btn btn-primary">Sök</button>
+    <a href="/bookings" class="btn btn-secondary">Rensa</a>
+</form>
+
+<section class="table-wrap">
+    <table class="stats-table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Titel</th>
+                <th>Lokal</th>
+                <th>Start</th>
+                <th>Slut</th>
+                <th>Kontakt</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for booking in bookings %}
+            <tr class="clickable-row" data-href="/bookings/{{ booking.id }}">
+                <td>{{ booking.id }}</td>
+                <td>{{ booking.title }}</td>
+                <td>{{ booking.venue.name if booking.venue else booking.venue_id }}</td>
+                <td>{{ booking.start_time }}</td>
+                <td>{{ booking.end_time }}</td>
+                <td>{{ booking.contact_name }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

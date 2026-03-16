@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Ny bokning{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Ny bokning</h1>
+    <p class="page-subtitle">Skapa en ny bokning för vald lokal</p>
+</section>
+
+{% if error %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="post" action="/bookings/new" class="form-light booking-form glass">
+    <span>
+        <label for="venue_id">Lokal</label>
+        <select id="venue_id" name="venue_id" required>
+            <option value="">Välj lokal</option>
+            {% for venue in venues %}
+            <option value="{{ venue.id }}"
+                {% if form_data.get('venue_id') == venue.id %}selected{% endif %}>
+                {{ venue.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </span>
+
+    <span>
+        <label for="title">Titel</label>
+        <input id="title" type="text" name="title" value="{{ form_data.get('title', '') }}" required>
+    </span>
+
+    <span>
+        <label for="description">Beskrivning</label>
+        <textarea id="description" name="description" rows="4">{{ form_data.get('description', '') }}</textarea>
+    </span>
+
+    <span>
+        <label for="contact_name">Kontaktperson</label>
+        <input id="contact_name" type="text" name="contact_name" value="{{ form_data.get('contact_name', '') }}" required>
+    </span>
+
+    <span>
+        <label for="contact_email">E-post</label>
+        <input id="contact_email" type="email" name="contact_email" value="{{ form_data.get('contact_email', '') }}" required>
+    </span>
+
+    <span>
+        <label for="contact_phone">Telefon</label>
+        <input id="contact_phone" type="text" name="contact_phone" value="{{ form_data.get('contact_phone', '') }}">
+    </span>
+
+    <div class="booking-form-grid">
+        <span>
+            <label for="start_time">Starttid</label>
+            <input id="start_time" type="datetime-local" name="start_time" value="{{ form_data.get('start_time', '') }}" required>
+        </span>
+
+        <span>
+            <label for="end_time">Sluttid</label>
+            <input id="end_time" type="datetime-local" name="end_time" value="{{ form_data.get('end_time', '') }}" required>
+        </span>
+    </div>
+
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Spara bokning</button>
+        <a href="/bookings" class="btn btn-secondary">Avbryt</a>
+    </div>
+</form>
+{% endblock %}

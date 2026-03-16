@@ -25,6 +25,7 @@ class BookingRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: int
+    organization_id: int
     venue_id: int
     title: str
     description: str | None
@@ -35,3 +36,4 @@ class BookingRead(BaseModel):
     end_time: datetime
     status: str
     created_at: datetime
+    updated_at: datetime

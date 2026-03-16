@@ -1,15 +1,16 @@
 from fastapi import FastAPI
-from app.api.routes.venues import router as venues_router
-from app.api.routes.bookings import router as bookings_router
-from app.api.routes.organizations import router as organizations_router
+from fastapi.staticfiles import StaticFiles
 
-app = FastAPI(title="Flex Bookings")
+from app.ui.routes import router as ui_router
+from app.api.routes import bookings, venues
 
-app.include_router(venues_router, prefix="/venues", tags=["venues"])
-app.include_router(bookings_router, prefix="/bookings", tags=["bookings"])
-app.include_router(organizations_router, prefix="/organizations", tags=["organizations"])
+app = FastAPI()
 
+app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
-@app.get("/")
-def root():
-    return {"message": "Flex Bookings API is running"}
+# UI
+app.include_router(ui_router)
+
+# API
+app.include_router(bookings.router, prefix="/api/bookings")
+app.include_router(venues.router, prefix="/api/venues")

@@ -14,7 +14,16 @@ class VenueNotFoundError(Exception):
     pass
 
 
+class InvalidBookingTimeError(Exception):
+    pass
+
+
 def create_booking(db: Session, booking_data: BookingCreate) -> Booking:
+    if booking_data.end_time <= booking_data.start_time:
+        raise InvalidBookingTimeError(
+            "Sluttiden måste vara senare än starttiden."
+        )
+
     venue = db.get(Venue, booking_data.venue_id)
     if not venue:
         raise VenueNotFoundError("Venue not found.")
@@ -34,6 +43,7 @@ def create_booking(db: Session, booking_data: BookingCreate) -> Booking:
         )
 
     booking = Booking(
+        organization_id=venue.organization_id,
         venue_id=booking_data.venue_id,
         title=booking_data.title,
         description=booking_data.description,

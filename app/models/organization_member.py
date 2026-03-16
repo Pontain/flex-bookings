@@ -1,11 +1,11 @@
-from datetime import datetime
 from sqlalchemy import String, ForeignKey, DateTime, func, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.models.mixins import TimestampMixin
 from app.core.database import Base
 
 
-class OrganizationMember(Base):
+class OrganizationMember(Base, TimestampMixin):
     __tablename__ = "organization_members"
     __table_args__ = (
         UniqueConstraint("user_id", "organization_id", name="uq_user_organization"),
@@ -22,10 +22,6 @@ class OrganizationMember(Base):
 
     role: Mapped[str] = mapped_column(String(30), default="member")
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=text("CURRENT_TIMESTAMP")
-    )
 
     user: Mapped["User"] = relationship(
         back_populates="organization_memberships"
