@@ -1,0 +1,79 @@
+function formatDayLabel(date) {
+    return date.toLocaleDateString("sv-SE", {
+        weekday: "short",
+        day: "numeric",
+        month: "short"
+    });
+}
+
+function formatTime(dateString) {
+    const d = new Date(dateString);
+    return d.toLocaleTimeString("sv-SE", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
+async function loadDashboardCalendar() {
+    const config = window.dashboardCalendarConfig;
+
+    const response = await fetch(
+        `/calendar/events?start=${encodeURIComponent(config.start)}&end=${encodeURIComponent(config.end)}`
+    );
+
+    const events = await response.json();
+    renderDashboardCalendar(config.start, events);
+}
+
+function renderDashboardCalendar(startString, events) {
+    const container = document.getElementById("dashboard-calendar");
+    container.innerHTML = "";
+
+    const weekStart = new Date(startString);
+
+    for (let i = 0; i < 7; i++) {
+        const dayDate = new Date(weekStart);
+        dayDate.setDate(dayDate.getDate() + i);
+
+        const column = document.createElement("div");
+        column.className = "dashboard-day";
+
+        const header = document.createElement("div");
+        header.className = "dashboard-day-header";
+        header.textContent = formatDayLabel(dayDate);
+
+        const body = document.createElement("div");
+        body.className = "dashboard-day-body";
+
+        const dayEvents = events.filter(event => {
+            const eventStart = new Date(event.start);
+            return eventStart.toDateString() === dayDate.toDateString();
+        });
+
+        if (dayEvents.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "dashboard-empty";
+            empty.textContent = "Inga bokningar";
+            body.appendChild(empty);
+        } else {
+            dayEvents.forEach(event => {
+                const card = document.createElement("div");
+                card.className = "dashboard-booking-card";
+
+                card.innerHTML = `
+                    <div class="booking-time">${formatTime(event.start)} - ${formatTime(event.end)}</div>
+                    <div class="booking-title">${event.title}</div>
+                    <div class="booking-contact">${event.contact_name ?? ""}</div>
+                `;
+
+                body.appendChild(card);
+            });
+        }
+
+        column.appendChild(header);
+        column.appendChild(body);
+        container.appendChild(column);
+    }
+}
+
+loadDashboardCalendar();

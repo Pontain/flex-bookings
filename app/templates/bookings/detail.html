@@ -39,17 +39,17 @@
 
         <div class="info-row">
             <div class="label">Start</div>
-            <div class="value">{{ booking.start_time }}</div>
+            <div class="value">{{ booking.start_time | datetime }}</div>
         </div>
 
         <div class="info-row">
             <div class="label">Slut</div>
-            <div class="value">{{ booking.end_time }}</div>
+            <div class="value">{{ booking.end_time | datetime }}</div>
         </div>
 
         <div class="info-row">
             <div class="label">Skapad</div>
-            <div class="value">{{ booking.created_at }}</div>
+            <div class="value">{{ booking.created_at | datetime }}</div>
         </div>
     </div>
 

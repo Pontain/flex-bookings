@@ -3,6 +3,11 @@
 {% block title %}Lokaler{% endblock %}
 
 {% block content %}
+
+<div class="action-buttons">
+    <a href="/venues/new" class="btn btn-primary">+ Ny lokal</a>
+</div>
+
 <section class="page-header">
     <h1>Lokaler</h1>
     <p class="page-subtitle">Alla bokningsbara lokaler</p>
@@ -14,8 +19,9 @@
             <tr>
                 <th>Id</th>
                 <th>Namn</th>
-                <th>Adress</th>
+                <th>Beskrivning</th>
                 <th>Kapacitet</th>
+                <th>Åtgärder</th>
             </tr>
         </thead>
         <tbody>
@@ -23,8 +29,14 @@
             <tr>
                 <td>{{ venue.id }}</td>
                 <td>{{ venue.name }}</td>
-                <td>{{ venue.address or "-" }}</td>
+                <td>{{ venue.description or "-" }}</td>
                 <td>{{ venue.capacity or "-" }}</td>
+
+                <td>
+                    <form method="post" action="/venues/{{ venue.id }}/delete" class="form-inline">
+                        <button type="submit" class="btn btn-danger" onclick="return confirm('Är du säker på att du vill radera denna lokal?')">Ta bort</button>
+                    </form>
+                </td>
             </tr>
             {% endfor %}
         </tbody>

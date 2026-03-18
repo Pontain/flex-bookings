@@ -20,6 +20,13 @@ from app.services.booking_service import (
 router = APIRouter(tags=["UI"])
 templates = Jinja2Templates(directory="app/templates")
 
+def format_datetime(value):
+    if not value:
+        return "-"
+    return value.strftime("%Y-%m-%d %H:%M")
+
+templates.env.filters["datetime"] = format_datetime
+
 
 @router.get("/", response_class=HTMLResponse)
 def dashboard(request: Request, db: Session = Depends(get_db)):
@@ -65,6 +72,72 @@ def list_venues(request: Request, db: Session = Depends(get_db)):
             "request": request,
             "venues": venues,
         },
+    )
+
+
+@router.get("/venues/new", response_class=HTMLResponse)
+def create_venue_form(request: Request):
+    return templates.TemplateResponse(
+        "venues/create.html",
+        {
+            "request": request,
+            "error": None,
+            "form_data": {},
+        },
+    )
+
+
+@router.post("/venues/new", response_class=HTMLResponse)
+def create_venue_submit(
+    request: Request,
+    name: str = Form(...),
+    description: str | None = Form(None),
+    capacity: int | None = Form(None),
+    db: Session = Depends(get_db),
+):
+    form_data = {
+        "name": name,
+        "description": description or "",
+        "capacity": capacity or "",
+    }
+
+    if not name:
+        return templates.TemplateResponse(
+            "venues/create.html",
+            {
+                "request": request,
+                "error": "Namn krävs",
+                "form_data": form_data,
+            },
+        )
+
+    venue = Venue(
+        organization_id=1,  # TODO: Hämta från inloggad användares organisation
+        name=name,
+        description=description or None,
+        capacity=capacity,
+    )
+
+    db.add(venue)
+    db.commit()
+
+    return RedirectResponse(
+        url="/venues",
+        status_code=303,
+    )
+
+
+@router.post("/venues/{venue_id}/delete")
+def delete_venue(venue_id: int, db: Session = Depends(get_db)):
+    venue = db.get(Venue, venue_id)
+
+    if venue:
+        db.delete(venue)
+        db.commit()
+
+    return RedirectResponse(
+        url="/venues",
+        status_code=303,
     )
 
 

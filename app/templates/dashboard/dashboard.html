@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+</head>
+<body>
+    <div class="dashboard-page">
+        <header class="dashboard-header">
+            <div>
+                <h1>Dashboard</h1>
+                <p>Översikt över bokningar och lokaler</p>
+            </div>
+
+            <nav class="dashboard-nav">
+                <a href="/calendar/week" class="nav-button">Öppna kalender</a>
+                <a href="/bookings/new" class="nav-button primary">Ny bokning</a>
+            </nav>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card">
+                <h2>Bokningar idag</h2>
+                <p class="stat-number">{{ bookings_today }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>Bokningar denna vecka</h2>
+                <p class="stat-number">{{ bookings_this_week }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>Aktiva lokaler</h2>
+                <p class="stat-number">{{ active_venues }}</p>
+            </div>
+
+            <div class="stat-card">
+                <h2>Nästa bokning</h2>
+                {% if next_booking %}
+                    <p class="next-booking-title">{{ next_booking.title }}</p>
+                    <p>
+                        {{ next_booking.start_time.strftime("%Y-%m-%d %H:%M") }}
+                    </p>
+                {% else %}
+                    <p>Ingen kommande bokning</p>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="calendar-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>Veckans bokningar</h2>
+                    <p>{{ week_start }} till {{ week_end }}</p>
+                </div>
+                <a href="/calendar/week" class="text-link">Visa full kalender</a>
+            </div>
+
+            <div id="dashboard-calendar" class="dashboard-calendar"></div>
+        </section>
+    </div>
+
+    <script>
+        window.dashboardCalendarConfig = {
+            start: "{{ week_start }}T00:00:00",
+            end: "{{ week_end }}T00:00:00"
+        };
+    </script>
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>

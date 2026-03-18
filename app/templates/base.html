@@ -2,18 +2,30 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Bokningssystem{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', path='styles.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css">
+
+    <!-- GLOBAL CSS -->
+    <link rel="stylesheet" href="/static/css/base.css">
+
+    <!-- SID-SPECIFIK CSS -->
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-    {% include "components/_navbar.html" %}
 
-    <main>
-        <div class="container content-card">
-            {% block content %}{% endblock %}
-        </div>
+    <header class="main-header">
+        <nav class="main-nav">
+            <a href="/dashboard">Dashboard</a>
+            <a href="/calendar/week">Kalender</a>
+            <a href="/bookings/new">Ny bokning</a>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
     </main>
+
+    <!-- GLOBAL JS (om du vill ha senare) -->
+    {% block extra_js %}{% endblock %}
+
 </body>
 </html>

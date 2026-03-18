@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Ny lokal{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Ny lokal</h1>
+</section>
+
+{% if error %}
+<div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+<form method="post" action="/venues/new" class="form-light glass">
+    <span>
+        <label>Namn</label>
+        <input type="text" name="name" value="{{ form_data.get('name','') }}" required>
+    </span>
+
+    <span>
+        <label>Beskrivning</label>
+        <input type="text" name="description" value="{{ form_data.get('description','') }}">
+    </span>
+
+    <span>
+        <label>Kapacitet</label>
+        <input type="number" name="capacity" value="{{ form_data.get('capacity','') }}">
+    </span>
+
+    <div class="form-actions">
+        <button class="btn btn-primary">Spara</button>
+        <a href="/venues" class="btn btn-secondary">Avbryt</a>
+    </div>
+</form>
+{% endblock %}

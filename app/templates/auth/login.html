@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Logga in{% endblock %}
+
+{% block content %}
+<div class="content-card" style="max-width: 500px; margin: 2rem auto;">
+    <h1>Logga in</h1>
+
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/login" class="form-light">
+        <span>
+            <label for="email">E-post</label>
+            <input type="email" name="email" id="email" required>
+        </span>
+
+        <span>
+            <label for="password">Lösenord</label>
+            <input type="password" name="password" id="password" required>
+        </span>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Logga in</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

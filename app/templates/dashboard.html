@@ -2,38 +2,31 @@
 
 {% block title %}Dashboard{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/dashboard.css">
+{% endblock %}
+
 {% block content %}
-<section class="page-header">
-    <h1>Dashboard</h1>
-    <p class="page-subtitle">Översikt över lokaler och bokningar</p>
-</section>
+<div class="dashboard-page">
 
-<section class="stats-grid stats-grid-3">
-    <article class="stats-card">
-        <h3>Lokaler</h3>
-        <p class="stats-number">{{ venue_count }}</p>
-    </article>
+    <header class="dashboard-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p>Översikt över bokningar och lokaler</p>
+        </div>
 
-    <article class="stats-card">
-        <h3>Dagens bokningar</h3>
-        <p class="stats-number">{{ today_booking_count }}</p>
-    </article>
+        <div class="dashboard-nav">
+            <a href="/calendar/week" class="nav-button">Öppna kalender</a>
+            <a href="/bookings/new" class="nav-button primary">Ny bokning</a>
+        </div>
+    </header>
 
-    <article class="stats-card">
-        <h3>Kommande bokningar</h3>
-        <p class="stats-number">{{ upcoming_booking_count }}</p>
-    </article>
-</section>
+    <!-- resten som tidigare -->
+    <div id="dashboard-calendar" class="dashboard-calendar"></div>
 
-<section class="glass page-card">
-    <div class="section-header">
-        <h2>Snabbval</h2>
-    </div>
+</div>
+{% endblock %}
 
-    <div class="action-buttons">
-        <a href="/bookings/new" class="btn btn-primary">+ Ny bokning</a>
-        <a href="/bookings" class="btn btn-secondary">Visa bokningar</a>
-        <a href="/venues" class="btn btn-secondary">Visa lokaler</a>
-    </div>
-</section>
+{% block extra_js %}
+<script src="/static/js/dashboard.js"></script>
 {% endblock %}
