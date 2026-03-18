@@ -13,10 +13,15 @@
                 <p>Översikt över bokningar och lokaler</p>
             </div>
 
-            <nav class="dashboard-nav">
-                <a href="/calendar/week" class="nav-button">Öppna kalender</a>
-                <a href="/bookings/new" class="nav-button primary">Ny bokning</a>
-            </nav>
+            <div class="dashboard-actions">
+                <a href="/calendar" class="btn btn-secondary">Öppna kalender</a>
+                <a href="/bookings/new" class="btn btn-primary">Ny bokning</a>
+                <a href="/venues" class="btn btn-secondary">Lokaler</a>
+
+                {% if current_user.role == "admin" %}
+                    <a href="/users" class="btn btn-secondary">Användare</a>
+                {% endif %}
+            </div>
         </header>
 
         <section class="stats-grid">

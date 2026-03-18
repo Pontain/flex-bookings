@@ -1,15 +1,23 @@
 from datetime import date
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.models.venue import Venue
+from app.models.user import User
+from app.core.dependencies import get_current_user
 from app.schemas.venue import VenueCreate, VenueRead
 from app.services.availability_service import get_available_slots
 from app.schemas.availability import AvailabilitySlot
 
 router = APIRouter()
+
+def require_admin(current_user: User):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Behörighet saknas")
 
 
 @router.post("/", response_model=VenueRead, status_code=status.HTTP_201_CREATED)
@@ -54,3 +62,49 @@ def venue_availability(
     db: Session = Depends(get_db)
 ):
     return get_available_slots(db, venue_id, date)
+
+@router.get("/venues/{venue_id}/edit", response_class=HTMLResponse)
+def edit_venue_form(
+    venue_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    require_admin(current_user)
+
+    venue = db.get(Venue, venue_id)
+    if not venue:
+        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
+
+    return templates.TemplateResponse(
+        "venues/edit.html",
+        {
+            "request": request,
+            "venue": venue,
+            "current_user": current_user,
+        }
+    )
+
+
+@router.post("/venues/{venue_id}/edit")
+def edit_venue(
+    venue_id: int,
+    name: str = Form(...),
+    description: str = Form(""),
+    capacity: int = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    require_admin(current_user)
+
+    venue = db.get(Venue, venue_id)
+    if not venue:
+        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
+
+    venue.name = name
+    venue.description = description if description else None
+    venue.capacity = capacity
+
+    db.commit()
+
+    return RedirectResponse(url="/venues", status_code=303)

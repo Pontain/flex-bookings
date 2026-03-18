@@ -64,5 +64,6 @@ def dashboard_view(
             "next_booking": next_booking,
             "week_start": start_of_week.strftime("%Y-%m-%d"),
             "week_end": end_of_week.strftime("%Y-%m-%d"),
+            "current_user": current_user,
         }
     )
