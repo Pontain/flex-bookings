@@ -25,3 +25,8 @@ class User(Base, TimestampMixin):
     organization: Mapped["Organization"] = relationship(
         back_populates="users"
     )
+
+    organization_memberships: Mapped[list["OrganizationMember"]] = relationship(
+    back_populates="user",
+    cascade="all, delete-orphan"
+    )

@@ -9,6 +9,8 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.models.booking import Booking
 from app.models.venue import Venue
+from app.models.user import User
+from app.core.dependencies import get_current_user
 
 router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
@@ -20,7 +22,11 @@ def home_redirect_dashboard(request: Request, db: Session = Depends(get_db)):
 
 
 @router.get("/dashboard", response_class=HTMLResponse)
-def dashboard_view(request: Request, db: Session = Depends(get_db)):
+def dashboard_view(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
     now = datetime.now()
 
     start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)

@@ -8,6 +8,7 @@ from app.api.routes import bookings, venues
 from app.api.routes import calendar as api_calendar
 from app.web.routes import calendar as web_calendar
 from app.web.routes import dashboard as web_dashboard
+from app.web.routes import auth
 
 app = FastAPI()
 
@@ -29,3 +30,4 @@ app.include_router(venues.router, prefix="/api/venues")
 app.include_router(api_calendar.router)
 app.include_router(web_calendar.router)
 app.include_router(web_dashboard.router)
+app.include_router(auth.router)
