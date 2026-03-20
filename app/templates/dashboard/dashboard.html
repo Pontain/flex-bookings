@@ -18,7 +18,7 @@
                 <a href="/bookings/new" class="btn btn-primary">Ny bokning</a>
                 <a href="/venues" class="btn btn-secondary">Lokaler</a>
 
-                {% if current_user.role == "admin" %}
+                {% if current_user.is_superuser %}
                     <a href="/users" class="btn btn-secondary">Användare</a>
                 {% endif %}
             </div>

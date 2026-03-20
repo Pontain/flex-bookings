@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Användare</title>
+</head>
+<body>
+    <h1>Användare</h1>
+    <p>Här är systemets användare.</p>
+
+    <p>
+        <a href="/users/new">+ Ny användare</a>
+    </p>
+
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Namn</th>
+                <th>E-post</th>
+                <th>Aktiv</th>
+                <th>Admin</th>
+                <th>Åtgärder</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.full_name }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ "Ja" if user.is_active else "Nej" }}</td>
+                <td>{{ "Ja" if user.is_superuser else "Nej" }}</td>
+                <td> 
+                    <a href="/users/{{ user.id }}/edit">Redigera</a>
+                    
+                    {% if user.id != current_user.id %}
+                    <form
+                        method="post"
+                        action="/users/{{ user.id }}/delete"
+                        style="display:inline;"
+                        onsubmit="return confirm('Är du säker på att du vill ta bort användaren {{ user.email }}?');"
+                    >
+                        <button type="submit">Ta bort</button>
+                    </form>
+                    {% else %}
+                        (du)
+                    {% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <p><a href="/dashboard">Tillbaka till dashboard</a></p>
+</body>
+</html>

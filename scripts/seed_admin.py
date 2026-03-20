@@ -17,6 +17,7 @@ def main():
 
     user = User(
         organization_id=1,
+        role="admin",
         email=email,
         full_name="Admin",
         hashed_password=hash_password(password),  # 👈 hash sker här

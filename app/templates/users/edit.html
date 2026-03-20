@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Redigera användare</title>
+</head>
+<body>
+    <h1>Redigera användare</h1>
+
+    <form method="post">
+        <p>
+            <label>Namn:</label><br>
+            <input type="text" name="full_name" value="{{ user.full_name }}">
+        </p>
+
+        <p>
+            <label>E-post:</label><br>
+            <input type="email" name="email" value="{{ user.email }}" required>
+        </p>
+
+        <p>
+            <label>Nytt lösenord:</label><br>
+            <input type="password" name="password">
+        </p>
+
+        <p>
+            <small>Lämna lösenord tomt om det inte ska ändras.</small>
+        </p>
+
+        <p>
+            <label>Aktiv:</label>
+            <input
+                type="checkbox"
+                name="is_active"
+                {% if user.is_active %}checked{% endif %}
+            >
+        </p>
+
+        <p>
+            <label>Admin:</label>
+            <input
+                type="checkbox"
+                name="is_superuser"
+                {% if user.is_superuser %}checked{% endif %}
+            >
+        </p>
+
+        <button type="submit">Spara</button>
+    </form>
+
+    <p><a href="/users">Tillbaka</a></p>
+</body>
+</html>

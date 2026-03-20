@@ -31,7 +31,9 @@
                 <td>{{ venue.name }}</td>
                 <td>{{ venue.description or "-" }}</td>
                 <td>{{ venue.capacity or "-" }}</td>
-
+                <td>
+                    <a href="/venues/{{ venue.id }}/edit" class="btn btn-secondary">Redigera</a>
+                </td>
                 <td>
                     <form method="post" action="/venues/{{ venue.id }}/delete" class="form-inline">
                         <button type="submit" class="btn btn-danger" onclick="return confirm('Är du säker på att du vill radera denna lokal?')">Ta bort</button>

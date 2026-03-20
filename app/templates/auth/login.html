@@ -1,29 +1,38 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlexBooking | Logga in</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+<body>
+    <div class="page-shell">
+        <div class="glass-card">
+            <div class="hero-block">
+                <h1>FlexBooking</h1>
+                <p class="lead">
+                    Ett enkelt bokningssystem för föreningar, lokaler och aktiviteter.
+                </p>
+                <p class="subtext">
+                    Hantera bokningar, lokaler och användare i ett och samma system.
+                </p>
+            </div>
 
-{% block title %}Logga in{% endblock %}
+            <div class="login-block">
+                <h2>Logga in</h2>
 
-{% block content %}
-<div class="content-card" style="max-width: 500px; margin: 2rem auto;">
-    <h1>Logga in</h1>
+                <form method="post" action="/login" class="login-form">
+                    <label for="email">E-post</label>
+                    <input type="email" id="email" name="email" required>
 
-    {% if error %}
-        <div class="alert alert-danger">{{ error }}</div>
-    {% endif %}
+                    <label for="password">Lösenord</label>
+                    <input type="password" id="password" name="password" required>
 
-    <form method="post" action="/login" class="form-light">
-        <span>
-            <label for="email">E-post</label>
-            <input type="email" name="email" id="email" required>
-        </span>
-
-        <span>
-            <label for="password">Lösenord</label>
-            <input type="password" name="password" id="password" required>
-        </span>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Logga in</button>
+                    <button type="submit" class="btn btn-primary">Logga in</button>
+                </form>
+            </div>
         </div>
-    </form>
-</div>
-{% endblock %}
+    </div>
+</body>
+</html>

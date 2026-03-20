@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Redigera lokal</title>
+</head>
+<body>
+    <h1>Redigera lokal</h1>
+
+    <form method="post">
+        <p>
+            <label>Namn:</label><br>
+            <input type="text" name="name" value="{{ venue.name }}" required>
+        </p>
+
+        <p>
+            <label>Beskrivning:</label><br>
+            <textarea name="description" rows="4" cols="40">{{ venue.description or "" }}</textarea>
+        </p>
+
+        <p>
+            <label>Kapacitet:</label><br>
+            <input type="number" name="capacity" value="{{ venue.capacity if venue.capacity is not none else '' }}">
+        </p>
+
+        <p>
+            <label>Aktiv:</label>
+            <input
+                type="checkbox"
+                name="is_active"
+                {% if venue.is_active %}checked{% endif %}
+            >
+        </p>
+
+        <button type="submit">Spara</button>
+    </form>
+
+    <p><a href="/venues">Tillbaka</a></p>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <title>Ny användare</title>
+</head>
+<body>
+    <h1>Ny användare</h1>
+
+    <form method="post">
+        <p>
+            <label>Namn:</label><br>
+            <input type="text" name="full_name">
+        </p>
+
+        <p>
+            <label>E-post:</label><br>
+            <input type="email" name="email" required>
+        </p>
+
+        <p>
+            <label>Lösenord:</label><br>
+            <input type="password" name="password" required>
+        </p>
+
+        <p>
+            <label>Admin:</label>
+            <input type="checkbox" name="is_superuser">
+        </p>
+
+        <button type="submit">Skapa</button>
+    </form>
+
+    <p><a href="/users">Tillbaka</a></p>
+</body>
+</html>
