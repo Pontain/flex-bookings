@@ -28,35 +28,11 @@ def format_datetime(value):
 templates.env.filters["datetime"] = format_datetime
 
 
-@router.get("/", response_class=HTMLResponse)
-def dashboard(request: Request, db: Session = Depends(get_db)):
-    today = datetime.now().date()
-    tomorrow = today + timedelta(days=1)
-    now = datetime.now()
-
-    venue_count = db.scalar(select(func.count()).select_from(Venue)) or 0
-
-    today_booking_count = db.scalar(
-        select(func.count()).select_from(Booking).where(
-            Booking.start_time >= datetime.combine(today, datetime.min.time()),
-            Booking.start_time < datetime.combine(tomorrow, datetime.min.time()),
-        )
-    ) or 0
-
-    upcoming_booking_count = db.scalar(
-        select(func.count()).select_from(Booking).where(
-            Booking.start_time >= now
-        )
-    ) or 0
-
-    return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
-            "venue_count": venue_count,
-            "today_booking_count": today_booking_count,
-            "upcoming_booking_count": upcoming_booking_count,
-        },
+@router.get("/")
+def root_redirect_login():
+    return RedirectResponse(
+        url="/login",
+        status_code=status.HTTP_303_SEE_OTHER,
     )
 
 
