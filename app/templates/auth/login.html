@@ -1,20 +1,15 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlexBooking | Logga in</title>
-    <link rel="stylesheet" href="/static/css/login.css">
-</head>
-<body>
+{% extends "base.html" %}
 
-    <!-- ✨ NYTT: bakgrund -->
-    <div class="background">
-        <div class="glow glow1"></div>
-        <div class="glow glow2"></div>
-        <div class="glow glow3"></div>
-    </div>
+{% block title %}FlexBooking | Logga in{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/login.css">
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="login-page">
     <div class="page-shell">
         <div class="glass-card">
             <div class="hero-block">
@@ -42,5 +37,5 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

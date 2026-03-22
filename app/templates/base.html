@@ -2,30 +2,41 @@
 <html lang="sv">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Bokningssystem{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FlexBooking{% endblock %}</title>
 
-    <!-- GLOBAL CSS -->
     <link rel="stylesheet" href="/static/css/base.css">
-
-    <!-- SID-SPECIFIK CSS -->
     {% block extra_css %}{% endblock %}
 </head>
 <body>
 
-    <header class="main-header">
-        <nav class="main-nav">
-            <a href="/dashboard">Dashboard</a>
-            <a href="/calendar/week">Kalender</a>
-            <a href="/bookings/new">Ny bokning</a>
-        </nav>
-    </header>
+    <div class="background">
+        <div class="glow glow1"></div>
+        <div class="glow glow2"></div>
+        <div class="glow glow3"></div>
+    </div>
 
-    <main class="main-content">
-        {% block content %}{% endblock %}
-    </main>
+    <div class="app-shell">
+        {% block header %}
+        <header class="main-header">
+            <div class="brand">
+                <a href="/dashboard">FlexBooking</a>
+            </div>
 
-    <!-- GLOBAL JS (om du vill ha senare) -->
+            <nav class="main-nav">
+                <a href="/dashboard">Dashboard</a>
+                <a href="/calendar/week">Kalender</a>
+                <a href="/bookings/new">Ny bokning</a>
+                <a href="/venues">Lokaler</a>
+            </nav>
+        </header>
+        {% endblock %}
+
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
     {% block extra_js %}{% endblock %}
-
 </body>
 </html>
