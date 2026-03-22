@@ -1,45 +1,61 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>Redigera lokal</title>
-</head>
-<body>
-    <h1>Redigera lokal</h1>
+{% extends "base.html" %}
 
-    <form method="post">
-        <p>
-            <label>Namn:</label><br>
-            <input type="text" name="name" value="{{ venue.name }}" required>
-        </p>
+{% block title %}FlexBooking | Redigera lokal{% endblock %}
 
-        <p>
-            <label>Beskrivning:</label><br>
-            <textarea name="description" rows="4" cols="40">{{ venue.description or "" }}</textarea>
-        </p>
+{% block content %}
+<div class="venues-page">
+    <div class="page-toolbar">
+        <div class="page-toolbar-left">
+            <h1 class="page-title">Redigera lokal</h1>
+            <p class="page-description">Uppdatera information om lokalen.</p>
+        </div>
+    </div>
 
-        <p>
-            <label>Kapacitet:</label><br>
-            <input type="number" name="capacity" value="{{ venue.capacity if venue.capacity is not none else '' }}">
-        </p>
+    <div class="content-card">
+        <form method="post" action="/venues/{{ venue.id }}/edit" class="form-dark">
+            <div class="form-group">
+                <label for="name">Namn</label>
+                <input type="text" id="name" name="name" value="{{ venue.name }}" required>
+            </div>
 
-        <p>
-            <label for="color">Färg</label>
-            <input type="color" id="color" name="color" value="{{ venue.color or '#5f73ff' }}">
-        </p>
+            <div class="form-group">
+                <label for="description">Beskrivning</label>
+                <textarea id="description" name="description">{{ venue.description or "" }}</textarea>
+            </div>
 
-        <p>
-            <label>Aktiv:</label>
-            <input
-                type="checkbox"
-                name="is_active"
-                {% if venue.is_active %}checked{% endif %}
-            >
-        </p>
+            <div class="form-group">
+                <label for="capacity">Kapacitet</label>
+                <input type="number" id="capacity" name="capacity" value="{{ venue.capacity }}" min="1" required>
+            </div>
 
-        <button type="submit">Spara</button>
-    </form>
+            <div class="form-group">
+                <label for="color">Färg</label>
+                <input
+                    type="color"
+                    id="color"
+                    name="color"
+                    value="{{ venue.color or '#5f73ff' }}"
+                    class="color-input"
+                >
+            </div>
 
-    <p><a href="/venues">Tillbaka</a></p>
-</body>
-</html>
+            <div class="form-group checkbox-group">
+                <label for="is_active" class="checkbox-label">
+                    <input
+                        type="checkbox"
+                        id="is_active"
+                        name="is_active"
+                        {% if venue.is_active %}checked{% endif %}
+                    >
+                    Aktiv
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Spara</button>
+                <a href="/venues" class="btn btn-secondary">Avbryt</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,36 +1,45 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>Ny användare</title>
-</head>
-<body>
-    <h1>Ny användare</h1>
+{% extends "base.html" %}
 
-    <form method="post">
-        <p>
-            <label>Namn:</label><br>
-            <input type="text" name="full_name">
-        </p>
+{% block title %}FlexBooking | Ny användare{% endblock %}
 
-        <p>
-            <label>E-post:</label><br>
-            <input type="email" name="email" required>
-        </p>
+{% block content %}
+<div class="users-page">
+    <div class="page-toolbar">
+        <div class="page-toolbar-left">
+            <h1 class="page-title">Ny användare</h1>
+            <p class="page-description">Skapa en ny användare i systemet.</p>
+        </div>
+    </div>
 
-        <p>
-            <label>Lösenord:</label><br>
-            <input type="password" name="password" required>
-        </p>
+    <div class="content-card">
+        <form method="post" action="/users/new" class="form-dark">
+            <div class="form-group">
+                <label for="full_name">Namn</label>
+                <input type="text" id="full_name" name="full_name" required>
+            </div>
 
-        <p>
-            <label>Admin:</label>
-            <input type="checkbox" name="is_superuser">
-        </p>
+            <div class="form-group">
+                <label for="email">E-post</label>
+                <input type="email" id="email" name="email" required>
+            </div>
 
-        <button type="submit">Skapa</button>
-    </form>
+            <div class="form-group">
+                <label for="password">Lösenord</label>
+                <input type="password" id="password" name="password" required>
+            </div>
 
-    <p><a href="/users">Tillbaka</a></p>
-</body>
-</html>
+            <div class="form-group checkbox-group">
+                <label for="is_superuser" class="checkbox-label">
+                    <input type="checkbox" id="is_superuser" name="is_superuser">
+                    Admin
+                </label>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Skapa</button>
+                <a href="/users" class="btn btn-secondary">Avbryt</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
