@@ -1,6 +1,6 @@
 function formatDayLabel(date) {
     return date.toLocaleDateString("sv-SE", {
-        weekday: "short",
+        weekday: "long",
         day: "numeric",
         month: "short"
     });
@@ -45,10 +45,12 @@ function renderDashboardCalendar(startString, events) {
         const body = document.createElement("div");
         body.className = "dashboard-day-body";
 
-        const dayEvents = events.filter(event => {
-            const eventStart = new Date(event.start);
-            return eventStart.toDateString() === dayDate.toDateString();
-        });
+        const dayEvents = events
+            .filter(event => {
+                const eventStart = new Date(event.start);
+                return eventStart.toDateString() === dayDate.toDateString();
+            })
+            .sort((a, b) => new Date(a.start) - new Date(b.start));
 
         if (dayEvents.length === 0) {
             const empty = document.createElement("div");
@@ -60,9 +62,13 @@ function renderDashboardCalendar(startString, events) {
                 const card = document.createElement("div");
                 card.className = "dashboard-booking-card";
 
+                if (event.venue_color) {
+                    card.style.borderLeftColor = event.venue_color;
+                }
+
                 card.innerHTML = `
-                    <div class="booking-time">${formatTime(event.start)} - ${formatTime(event.end)}</div>
                     <div class="booking-title">${event.title}</div>
+                    <div class="booking-time">${formatTime(event.start)} - ${formatTime(event.end)}</div>
                     <div class="booking-contact">${event.contact_name ?? ""}</div>
                 `;
 

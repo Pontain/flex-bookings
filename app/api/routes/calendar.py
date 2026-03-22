@@ -33,6 +33,7 @@ def get_calendar_events(
             "end": booking.end_time.isoformat(),
             "venue_id": booking.venue_id,
             "contact_name": booking.contact_name,
+            "venue_color": booking.venue.color if booking.venue else "#5f73ff",
         }
         for booking in bookings
     ]

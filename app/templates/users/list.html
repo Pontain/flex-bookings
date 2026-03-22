@@ -1,56 +1,56 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>Användare</title>
-</head>
-<body>
-    <h1>Användare</h1>
-    <p>Här är systemets användare.</p>
+{% extends "base.html" %}
+{% from "macros/actions.html" import row_actions %}
 
-    <p>
-        <a href="/users/new">+ Ny användare</a>
-    </p>
+{% block title %}FlexBooking | Användare{% endblock %}
 
-    <table border="1" cellpadding="8">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Namn</th>
-                <th>E-post</th>
-                <th>Aktiv</th>
-                <th>Admin</th>
-                <th>Åtgärder</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in users %}
-            <tr>
-                <td>{{ user.id }}</td>
-                <td>{{ user.full_name }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ "Ja" if user.is_active else "Nej" }}</td>
-                <td>{{ "Ja" if user.is_superuser else "Nej" }}</td>
-                <td> 
-                    <a href="/users/{{ user.id }}/edit">Redigera</a>
-                    
-                    {% if user.id != current_user.id %}
-                    <form
-                        method="post"
-                        action="/users/{{ user.id }}/delete"
-                        style="display:inline;"
-                        onsubmit="return confirm('Är du säker på att du vill ta bort användaren {{ user.email }}?');"
-                    >
-                        <button type="submit">Ta bort</button>
-                    </form>
-                    {% else %}
-                        (du)
-                    {% endif %}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+{% block content %}
+<div class="users-page">
+    <div class="page-toolbar">
+        <div class="page-toolbar-left">
+            <h1 class="page-title">Användare</h1>
+            <p class="page-description">Här är systemets användare.</p>
+        </div>
 
-    <p><a href="/dashboard">Tillbaka till dashboard</a></p>
-</body>
-</html>
+        <div class="page-toolbar-right">
+            <a href="/users/new" class="btn btn-primary">+ Ny användare</a>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table class="stats-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Namn</th>
+                    <th>E-post</th>
+                    <th>Aktiv</th>
+                    <th>Admin</th>
+                    <th>Åtgärder</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.full_name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ "Ja" if user.is_active else "Nej" }}</td>
+                    <td>{{ "Ja" if user.is_superuser else "Nej" }}</td>
+                    <td>
+                        {% if user.id != current_user.id %}
+                            {{ row_actions(
+                                edit_href='/users/' ~ user.id ~ '/edit',
+                                delete_action='/users/' ~ user.id ~ '/delete',
+                                delete_message='Är du säker på att du vill ta bort användaren ' ~ user.email ~ '?'
+                            ) }}
+                        {% else %}
+                            <span class="text-muted">(du)</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

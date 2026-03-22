@@ -19,6 +19,7 @@ class Venue(Base, TimestampMixin):
     description: Mapped[str | None] = mapped_column(Text(), nullable=True)
     capacity: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    color: Mapped[str] = mapped_column(String(7), default="#5f73ff")
 
 
     organization: Mapped["Organization"] = relationship(

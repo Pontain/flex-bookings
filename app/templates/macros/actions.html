@@ -1,0 +1,15 @@
+{% macro row_actions(edit_href=None, delete_action=None, delete_message="Är du säker?") %}
+<div class="table-actions">
+    {% if edit_href %}
+        <a href="{{ edit_href }}" class="btn btn-secondary">Redigera</a>
+    {% endif %}
+
+    {% if delete_action %}
+        <form method="post"
+              action="{{ delete_action }}"
+              onsubmit="return confirm('{{ delete_message }}');">
+            <button type="submit" class="btn btn-danger">Ta bort</button>
+        </form>
+    {% endif %}
+</div>
+{% endmacro %}

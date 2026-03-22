@@ -1,3 +1,5 @@
+{% from "macros/actions.html" import row_actions %}
+
 {% extends "base.html" %}
 
 {% block title %}Lokaler{% endblock %}
@@ -21,6 +23,7 @@
                 <th>Namn</th>
                 <th>Beskrivning</th>
                 <th>Kapacitet</th>
+                <th>Färg</th>
                 <th>Åtgärder</th>
             </tr>
         </thead>
@@ -32,12 +35,16 @@
                 <td>{{ venue.description or "-" }}</td>
                 <td>{{ venue.capacity or "-" }}</td>
                 <td>
-                    <a href="/venues/{{ venue.id }}/edit" class="btn btn-secondary">Redigera</a>
+                    <div class="venue-name">
+                        <span class="venue-color" style="background-color: {{ venue.color }}"></span>
+                    </div>
                 </td>
                 <td>
-                    <form method="post" action="/venues/{{ venue.id }}/delete" class="form-inline">
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Är du säker på att du vill radera denna lokal?')">Ta bort</button>
-                    </form>
+                    {{ row_actions(
+                        edit_href='/venues/' ~ venue.id ~ '/edit',
+                        delete_action='/venues/' ~ venue.id ~ '/delete',
+                        delete_message='Är du säker på att du vill ta bort lokalen?'
+                    ) }}
                 </td>
             </tr>
             {% endfor %}

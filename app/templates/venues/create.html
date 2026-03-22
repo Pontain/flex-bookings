@@ -27,6 +27,13 @@
         <input type="number" name="capacity" value="{{ form_data.get('capacity','') }}">
     </span>
 
+    <span>
+        <div class="color-field">
+            <label for="color">Färg</label>
+            <input type="color" id="color" name="color" value="#5f73ff" class="color-input">
+        </div>
+    </span>
+
     <div class="form-actions">
         <button class="btn btn-primary">Spara</button>
         <a href="/venues" class="btn btn-secondary">Avbryt</a>

@@ -30,6 +30,13 @@ function formatWeekLabel(startDate) {
     return `${startDate.toLocaleDateString("sv-SE")} - ${endDate.toLocaleDateString("sv-SE")}`;
 }
 
+function formatTime(dateString) {
+    return new Date(dateString).toLocaleTimeString("sv-SE", {
+        hour: "2-digit",
+        minute: "2-digit"
+    });
+}
+
 async function loadCalendar() {
     const weekStart = startOfWeek(currentDate);
     const weekEnd = endOfWeek(currentDate);
@@ -37,7 +44,7 @@ async function loadCalendar() {
     document.getElementById("week-label").textContent = formatWeekLabel(weekStart);
 
     const response = await fetch(
-        `/calendar/events?start=${weekStart.toISOString()}&end=${weekEnd.toISOString()}`
+        `/calendar/events?start=${encodeURIComponent(weekStart.toISOString())}&end=${encodeURIComponent(weekEnd.toISOString())}`
     );
 
     const events = await response.json();
@@ -55,6 +62,11 @@ function renderCalendar(weekStart, events) {
         const dayColumn = document.createElement("div");
         dayColumn.className = "calendar-day";
 
+        const today = new Date();
+        if (dayDate.toDateString() === today.toDateString()) {
+        dayColumn.classList.add("today");
+        }
+
         const header = document.createElement("div");
         header.className = "calendar-day-header";
         header.textContent = formatDateLabel(dayDate);
@@ -62,10 +74,12 @@ function renderCalendar(weekStart, events) {
         const body = document.createElement("div");
         body.className = "calendar-day-body";
 
-        const dayEvents = events.filter(event => {
-            const eventStart = new Date(event.start);
-            return eventStart.toDateString() === dayDate.toDateString();
-        });
+        const dayEvents = events
+            .filter(event => {
+                const eventStart = new Date(event.start);
+                return eventStart.toDateString() === dayDate.toDateString();
+            })
+            .sort((a, b) => new Date(a.start) - new Date(b.start));
 
         if (dayEvents.length === 0) {
             const empty = document.createElement("div");
@@ -75,16 +89,20 @@ function renderCalendar(weekStart, events) {
         } else {
             dayEvents.forEach(event => {
                 const card = document.createElement("div");
-                card.className = "booking-card";
+                card.className = "calendar-booking-card";
 
-                const start = new Date(event.start);
-                const end = new Date(event.end);
+                if (event.venue_color) {
+                    card.style.borderLeftColor = event.venue_color;
+                }
 
                 card.innerHTML = `
-                    <strong>${event.title}</strong>
-                    <div>${start.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}
-                    - ${end.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" })}</div>
-                    <div>${event.contact_name}</div>
+                    <div class="calendar-booking-title">${event.title}</div>
+                    <div class="calendar-booking-time">
+                        ${formatTime(event.start)} - ${formatTime(event.end)}
+                    </div>
+                    <div class="calendar-booking-meta">
+                        ${event.contact_name ?? ""}
+                    </div>
                 `;
 
                 body.appendChild(card);

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}FlexBooking | Dashboard{% endblock %}
+{% block title %}FlexBooking | Översikt{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/dashboard.css">
@@ -10,12 +10,12 @@
 <div class="dashboard-page">
     <header class="dashboard-header content-card">
         <div>
-            <h1>Dashboard</h1>
+            <h1>Översikt</h1>
             <p class="page-subtitle">Översikt över bokningar och lokaler</p>
         </div>
 
         <div class="dashboard-actions">
-            <a href="/calendar" class="btn btn-secondary">Öppna kalender</a>
+            <a href="/calendar/week" class="btn btn-secondary">Öppna kalender</a>
             <a href="/bookings/new" class="btn btn-primary">Ny bokning</a>
             <a href="/venues" class="btn btn-secondary">Lokaler</a>
 

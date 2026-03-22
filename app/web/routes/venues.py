@@ -44,6 +44,7 @@ def edit_venue(
     capacity: str = Form(""),
     is_active: str = Form(None),
     db: Session = Depends(get_db),
+    color: str = Form("#5f73ff"),
     current_user: User = Depends(get_current_user),
 ):
     venue = db.get(Venue, venue_id)
@@ -57,6 +58,7 @@ def edit_venue(
     venue.name = name
     venue.description = description if description.strip() else None
     venue.capacity = int(capacity) if capacity.strip() else None
+    venue.color = color
     venue.is_active = True if is_active else False
 
     db.commit()

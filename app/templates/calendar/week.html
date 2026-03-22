@@ -1,23 +1,35 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>Kalender</title>
-    <link rel="stylesheet" href="/static/css/calendar.css">
-</head>
-<body>
-    <div class="calendar-page">
-        <h1>Bokningskalender</h1>
+{% extends "base.html" %}
 
-        <div class="calendar-controls">
-            <button id="prev-week">Föregående vecka</button>
-            <h2 id="week-label"></h2>
-            <button id="next-week">Nästa vecka</button>
+{% block title %}FlexBooking | Kalender{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/calendar.css">
+{% endblock %}
+
+{% block content %}
+<div class="calendar-page">
+    <div class="page-toolbar">
+        <div class="page-toolbar-left">
+            <h1 class="page-title">Kalender</h1>
+            <p class="page-description">Veckoöversikt över bokningar</p>
+        </div>
+
+        <div class="page-toolbar-right">
+            <button id="prev-week" class="btn btn-secondary">Föregående vecka</button>
+            <button id="next-week" class="btn btn-secondary">Nästa vecka</button>
+        </div>
+    </div>
+
+    <div class="content-card calendar-shell">
+        <div class="calendar-header-row">
+            <h2 id="week-label" class="calendar-week-label"></h2>
         </div>
 
         <div id="calendar-grid" class="calendar-grid"></div>
     </div>
+</div>
+{% endblock %}
 
-    <script src="/static/js/calendar.js"></script>
-</body>
-</html>
+{% block extra_js %}
+<script src="/static/js/calendar.js"></script>
+{% endblock %}

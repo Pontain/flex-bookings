@@ -40,6 +40,7 @@ def create_venue(venue_data: VenueCreate, db: Session = Depends(get_db)):
         name=venue_data.name,
         description=venue_data.description,
         capacity=venue_data.capacity,
+        color=venue_data.color or "#5f73ff"
     )
 
     db.add(venue)
@@ -92,6 +93,7 @@ def edit_venue(
     name: str = Form(...),
     description: str = Form(""),
     capacity: int = Form(...),
+    color: str = Form("#5f73ff"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -104,6 +106,7 @@ def edit_venue(
     venue.name = name
     venue.description = description if description else None
     venue.capacity = capacity
+    venue.color = color
 
     db.commit()
 

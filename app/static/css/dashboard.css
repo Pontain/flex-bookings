@@ -42,10 +42,68 @@
 }
 
 .dashboard-calendar {
-    min-height: 420px;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(150px, 1fr));
+    gap: 1rem;
+    overflow-x: auto;
+    padding-bottom: 0.25rem;
+}
+
+.dashboard-day {
+    min-height: 320px;
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-day-header {
+    padding: 0.9rem 1rem;
+    font-weight: 600;
+    color: var(--text-main);
+    background: rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    text-transform: capitalize;
+}
+
+.dashboard-day-body {
+    padding: 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.dashboard-empty {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.dashboard-booking-card {
+    padding: 0.85rem 0.9rem;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.12);
+    border-left: 4px solid var(--accent-primary);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.booking-title {
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 0.25rem;
+}
+
+.booking-time {
+    color: var(--text-soft);
+    font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+}
+
+.booking-contact {
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
 @media (max-width: 900px) {
@@ -58,11 +116,19 @@
     .dashboard-actions {
         justify-content: flex-start;
     }
+
+    .dashboard-calendar {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 640px) {
     .dashboard-calendar {
-        min-height: 320px;
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-day {
+        min-height: auto;
     }
 
     .dashboard-actions .btn {
