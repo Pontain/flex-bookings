@@ -8,7 +8,9 @@ from sqlalchemy.orm import Session, selectinload
 from pydantic import ValidationError
 
 from app.api.deps import get_db
+from app.core.dependencies import get_current_user
 from app.models.booking import Booking
+from app.models.user import User
 from app.models.venue import Venue
 from app.schemas.booking import BookingCreate
 from app.services.booking_service import (
@@ -37,7 +39,7 @@ def root_redirect_login():
 
 
 @router.get("/venues", response_class=HTMLResponse)
-def list_venues(request: Request, db: Session = Depends(get_db)):
+def list_venues(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     venues = db.scalars(
         select(Venue).order_by(Venue.name.asc())
     ).all()
@@ -47,18 +49,20 @@ def list_venues(request: Request, db: Session = Depends(get_db)):
         {
             "request": request,
             "venues": venues,
+            "current_user": current_user,
         },
     )
 
 
 @router.get("/venues/new", response_class=HTMLResponse)
-def create_venue_form(request: Request):
+def create_venue_form(request: Request, current_user: User = Depends(get_current_user)):
     return templates.TemplateResponse(
         "venues/create.html",
         {
             "request": request,
             "error": None,
             "form_data": {},
+            "current_user": current_user,
         },
     )
 
@@ -123,6 +127,7 @@ def list_bookings(
     title: str | None = None,
     venue: str | None = None,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     stmt = (
         select(Booking)
@@ -143,12 +148,13 @@ def list_bookings(
         {
             "request": request,
             "bookings": bookings,
+            "current_user": current_user,
         },
     )
 
 
 @router.get("/bookings/new", response_class=HTMLResponse)
-def create_booking_form(request: Request, db: Session = Depends(get_db)):
+def create_booking_form(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     venues = db.scalars(
         select(Venue).order_by(Venue.name.asc())
     ).all()
@@ -160,6 +166,7 @@ def create_booking_form(request: Request, db: Session = Depends(get_db)):
             "venues": venues,
             "error": None,
             "form_data": {},
+            "current_user": current_user,
         },
     )
 
@@ -265,6 +272,7 @@ def booking_detail(
     booking_id: int,
     request: Request,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
 ):
     booking = db.scalar(
         select(Booking)
@@ -287,6 +295,7 @@ def booking_detail(
         {
             "request": request,
             "booking": booking,
+            "current_user": current_user,
         },
     )
 

@@ -28,6 +28,9 @@
                 <a href="/calendar/week">Kalender</a>
                 <a href="/bookings/new">Ny bokning</a>
                 <a href="/venues">Lokaler</a>
+                {% if current_user is defined and current_user.is_superuser %}
+                    <a href="/users">Användare</a>
+                {% endif %}
             </nav>
         </header>
         {% endblock %}

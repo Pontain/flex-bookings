@@ -15,13 +15,9 @@
         </div>
 
         <div class="dashboard-actions">
-            <a href="/calendar/week" class="btn btn-secondary">Öppna kalender</a>
-            <a href="/bookings/new" class="btn btn-primary">Ny bokning</a>
-            <a href="/venues" class="btn btn-secondary">Lokaler</a>
+            <a href="/bookings/new" class="btn btn-primary btn-hero">Ny bokning</a>
+            <a href="/venues" class="btn btn-neutral">Lokaler</a>
 
-            {% if current_user.is_superuser %}
-                <a href="/users" class="btn btn-secondary">Användare</a>
-            {% endif %}
         </div>
     </header>
 

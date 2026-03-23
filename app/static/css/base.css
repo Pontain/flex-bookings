@@ -601,6 +601,52 @@ a.btn {
   min-height: var(--control-height);
 }
 
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* ⭐ Primary (Ny bokning) */
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6, #06b6d4);
+    color: white;
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* 🔵 Secondary (Visa full kalender) */
+.btn-secondary {
+    background: #3b82f6;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #2563eb;
+}
+
+/* 🪶 Neutral (om du behöver fler senare) */
+.btn-neutral {
+    background: rgba(255,255,255,0.08);
+    color: #e5e7eb;
+}
+
+.btn-hero {
+    padding: 0.75rem 1.5rem;
+    font-size: 1.05rem;
+    border-radius: 12px;
+}
+
+.overview-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
 /* =========================================================
    STATS
    ========================================================= */
