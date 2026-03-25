@@ -22,6 +22,7 @@ class Organization(Base, TimestampMixin):
     )
 
     bookings: Mapped[list["Booking"]] = relationship(
+        back_populates="organization",
         cascade="all, delete-orphan"
     )
 

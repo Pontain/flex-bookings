@@ -4,6 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.mixins import TimestampMixin
 from app.core.database import Base
+from app.models.organization import Organization
 
 
 class Booking(Base, TimestampMixin):
@@ -38,4 +39,4 @@ class Booking(Base, TimestampMixin):
     status: Mapped[str] = mapped_column(String(30), default="confirmed")
 
     venue: Mapped["Venue"] = relationship(back_populates="bookings")
-    organization: Mapped["Organization"] = relationship()
+    organization: Mapped["Organization"] = relationship( back_populates="bookings")

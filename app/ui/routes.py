@@ -41,8 +41,10 @@ def root_redirect_login():
 @router.get("/venues", response_class=HTMLResponse)
 def list_venues(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     venues = db.scalars(
-        select(Venue).order_by(Venue.name.asc())
-    ).all()
+    select(Venue)
+    .where(Venue.organization_id == current_user.organization_id)
+    .order_by(Venue.name.asc())
+).all()
 
     return templates.TemplateResponse(
         "venues/list.html",
@@ -74,6 +76,7 @@ def create_venue_submit(
     description: str | None = Form(None),
     capacity: int | None = Form(None),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     form_data = {
         "name": name,
@@ -88,11 +91,12 @@ def create_venue_submit(
                 "request": request,
                 "error": "Namn krävs",
                 "form_data": form_data,
+                "current_user": current_user,
             },
         )
 
     venue = Venue(
-        organization_id=1,  # TODO: Hämta från inloggad användares organisation
+        organization_id=current_user.organization_id,
         name=name,
         description=description or None,
         capacity=capacity,
@@ -131,6 +135,7 @@ def list_bookings(
 ):
     stmt = (
         select(Booking)
+        .where(Booking.organization_id == current_user.organization_id)
         .options(selectinload(Booking.venue))
         .order_by(Booking.start_time.asc())
     )
