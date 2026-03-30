@@ -1,66 +1,121 @@
-from fastapi import APIRouter, Request, Depends, HTTPException, Form
+from fastapi import APIRouter, Request, Depends, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
-from app.core.templates import templates
 from app.core.dependencies import get_current_user
+from app.core.templates import templates
 from app.models.user import User
 from app.models.venue import Venue
 
-
 router = APIRouter()
 
-@router.get("/venues/{venue_id}/edit", response_class=HTMLResponse)
-def edit_venue_form(
-    venue_id: int,
+
+@router.get("/venues", response_class=HTMLResponse)
+def list_venues(
     request: Request,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    venue = db.get(Venue, venue_id)
-
-    if not venue:
-        raise HTTPException(status_code=404, detail="Lokalen finns inte")
-
-    if venue.organization_id != current_user.organization_id:
-        raise HTTPException(status_code=403, detail="Behörighet saknas")
+    venues = db.scalars(
+        select(Venue)
+        .where(Venue.organization_id == current_user.organization_id)
+        .order_by(Venue.name.asc())
+    ).all()
 
     return templates.TemplateResponse(
-        "venues/edit.html",
+        "venues/list.html",
         {
             "request": request,
+            "venues": venues,
             "current_user": current_user,
-            "venue": venue,
-        }
+        },
     )
 
 
-@router.post("/venues/{venue_id}/edit")
-def edit_venue(
-    venue_id: int,
-    name: str = Form(...),
-    description: str = Form(""),
-    capacity: str = Form(""),
-    is_active: str = Form(None),
-    db: Session = Depends(get_db),
-    color: str = Form("#5f73ff"),
+@router.get("/venues/new", response_class=HTMLResponse)
+def create_venue_form(
+    request: Request,
     current_user: User = Depends(get_current_user),
 ):
-    venue = db.get(Venue, venue_id)
+    return templates.TemplateResponse(
+        "venues/create.html",
+        {
+            "request": request,
+            "error": None,
+            "form_data": {},
+            "current_user": current_user,
+        },
+    )
 
-    if not venue:
-        raise HTTPException(status_code=404, detail="Lokalen finns inte")
 
-    if venue.organization_id != current_user.organization_id:
-        raise HTTPException(status_code=403, detail="Behörighet saknas")
+@router.post("/venues/new", response_class=HTMLResponse)
+def create_venue_submit(
+    request: Request,
+    name: str = Form(...),
+    description: str | None = Form(None),
+    capacity: int | None = Form(None),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    form_data = {
+        "name": name,
+        "description": description or "",
+        "capacity": capacity or "",
+    }
 
-    venue.name = name
-    venue.description = description if description.strip() else None
-    venue.capacity = int(capacity) if capacity.strip() else None
-    venue.color = color
-    venue.is_active = True if is_active else False
+    if not name.strip():
+        return templates.TemplateResponse(
+            "venues/create.html",
+            {
+                "request": request,
+                "error": "Namn krävs",
+                "form_data": form_data,
+                "current_user": current_user,
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
 
+    venue = Venue(
+        organization_id=current_user.organization_id,
+        name=name.strip(),
+        description=description or None,
+        capacity=capacity,
+    )
+
+    db.add(venue)
     db.commit()
 
-    return RedirectResponse(url="/venues", status_code=303)
+    return RedirectResponse(
+        url="/venues",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@router.post("/venues/{venue_id}/delete")
+def delete_venue(
+    venue_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    venue = db.scalar(
+        select(Venue).where(
+            Venue.id == venue_id,
+            Venue.organization_id == current_user.organization_id,
+        )
+    )
+
+    if not venue:
+        return RedirectResponse(
+            url="/venues",
+            status_code=status.HTTP_303_SEE_OTHER,
+        )
+
+    db.delete(venue)
+    db.commit()
+
+    return RedirectResponse(
+        url="/venues",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )

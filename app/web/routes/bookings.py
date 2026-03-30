@@ -1,11 +1,10 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from fastapi import APIRouter, Request, Depends, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
-from sqlalchemy import select, func
-from sqlalchemy.orm import Session, selectinload
 from pydantic import ValidationError
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
 
 from app.api.deps import get_db
 from app.core.dependencies import get_current_user
@@ -18,111 +17,9 @@ from app.services.booking_service import (
     BookingConflictError,
     VenueNotFoundError,
 )
+from app.core.templates import templates
 
-router = APIRouter(tags=["UI"])
-templates = Jinja2Templates(directory="app/templates")
-
-def format_datetime(value):
-    if not value:
-        return "-"
-    return value.strftime("%Y-%m-%d %H:%M")
-
-templates.env.filters["datetime"] = format_datetime
-
-
-@router.get("/")
-def root_redirect_login():
-    return RedirectResponse(
-        url="/login",
-        status_code=status.HTTP_303_SEE_OTHER,
-    )
-
-
-@router.get("/venues", response_class=HTMLResponse)
-def list_venues(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    venues = db.scalars(
-    select(Venue)
-    .where(Venue.organization_id == current_user.organization_id)
-    .order_by(Venue.name.asc())
-).all()
-
-    return templates.TemplateResponse(
-        "venues/list.html",
-        {
-            "request": request,
-            "venues": venues,
-            "current_user": current_user,
-        },
-    )
-
-
-@router.get("/venues/new", response_class=HTMLResponse)
-def create_venue_form(request: Request, current_user: User = Depends(get_current_user)):
-    return templates.TemplateResponse(
-        "venues/create.html",
-        {
-            "request": request,
-            "error": None,
-            "form_data": {},
-            "current_user": current_user,
-        },
-    )
-
-
-@router.post("/venues/new", response_class=HTMLResponse)
-def create_venue_submit(
-    request: Request,
-    name: str = Form(...),
-    description: str | None = Form(None),
-    capacity: int | None = Form(None),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    form_data = {
-        "name": name,
-        "description": description or "",
-        "capacity": capacity or "",
-    }
-
-    if not name:
-        return templates.TemplateResponse(
-            "venues/create.html",
-            {
-                "request": request,
-                "error": "Namn krävs",
-                "form_data": form_data,
-                "current_user": current_user,
-            },
-        )
-
-    venue = Venue(
-        organization_id=current_user.organization_id,
-        name=name,
-        description=description or None,
-        capacity=capacity,
-    )
-
-    db.add(venue)
-    db.commit()
-
-    return RedirectResponse(
-        url="/venues",
-        status_code=303,
-    )
-
-
-@router.post("/venues/{venue_id}/delete")
-def delete_venue(venue_id: int, db: Session = Depends(get_db)):
-    venue = db.get(Venue, venue_id)
-
-    if venue:
-        db.delete(venue)
-        db.commit()
-
-    return RedirectResponse(
-        url="/venues",
-        status_code=303,
-    )
+router = APIRouter()
 
 
 @router.get("/bookings", response_class=HTMLResponse)
@@ -131,7 +28,7 @@ def list_bookings(
     title: str | None = None,
     venue: str | None = None,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     stmt = (
         select(Booking)
@@ -159,9 +56,15 @@ def list_bookings(
 
 
 @router.get("/bookings/new", response_class=HTMLResponse)
-def create_booking_form(request: Request, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_booking_form(
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     venues = db.scalars(
-        select(Venue).order_by(Venue.name.asc())
+        select(Venue)
+        .where(Venue.organization_id == current_user.organization_id)
+        .order_by(Venue.name.asc())
     ).all()
 
     return templates.TemplateResponse(
@@ -188,8 +91,13 @@ def create_booking_submit(
     start_time: str = Form(...),
     end_time: str = Form(...),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    venues = db.scalars(select(Venue).order_by(Venue.name.asc())).all()
+    venues = db.scalars(
+        select(Venue)
+        .where(Venue.organization_id == current_user.organization_id)
+        .order_by(Venue.name.asc())
+    ).all()
 
     form_data = {
         "venue_id": venue_id,
@@ -224,12 +132,15 @@ def create_booking_submit(
                 "venues": venues,
                 "error": "Ogiltigt datumformat.",
                 "form_data": form_data,
+                "current_user": current_user,
             },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
     except ValidationError as e:
-        error_message = e.errors()[0]["msg"] if e.errors() else "Ogiltiga formulärdata."
+        error_message = (
+            e.errors()[0]["msg"] if e.errors() else "Ogiltiga formulärdata."
+        )
 
         return templates.TemplateResponse(
             "bookings/create.html",
@@ -238,6 +149,7 @@ def create_booking_submit(
                 "venues": venues,
                 "error": error_message,
                 "form_data": form_data,
+                "current_user": current_user,
             },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
@@ -250,6 +162,7 @@ def create_booking_submit(
                 "venues": venues,
                 "error": str(e),
                 "form_data": form_data,
+                "current_user": current_user,
             },
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -262,6 +175,7 @@ def create_booking_submit(
                 "venues": venues,
                 "error": str(e),
                 "form_data": form_data,
+                "current_user": current_user,
             },
             status_code=status.HTTP_400_BAD_REQUEST,
         )
@@ -277,12 +191,15 @@ def booking_detail(
     booking_id: int,
     request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     booking = db.scalar(
         select(Booking)
         .options(selectinload(Booking.venue))
-        .where(Booking.id == booking_id)
+        .where(
+            Booking.id == booking_id,
+            Booking.organization_id == current_user.organization_id,
+        )
     )
 
     if not booking:
@@ -291,6 +208,7 @@ def booking_detail(
             {
                 "request": request,
                 "message": "Bokningen hittades inte.",
+                "current_user": current_user,
             },
             status_code=status.HTTP_404_NOT_FOUND,
         )
@@ -303,7 +221,3 @@ def booking_detail(
             "current_user": current_user,
         },
     )
-
-@router.get("/ping")
-def ping():
-    return {"status": "ok"}

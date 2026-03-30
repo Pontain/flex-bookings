@@ -11,9 +11,9 @@ from app.models.booking import Booking
 from app.models.venue import Venue
 from app.models.user import User
 from app.core.dependencies import get_current_user
+from app.core.templates import templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/")
