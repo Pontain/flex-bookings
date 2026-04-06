@@ -16,14 +16,6 @@ from app.core.templates import templates
 router = APIRouter()
 
 
-@router.get("/")
-def home_redirect_login():
-    return RedirectResponse(
-        url="/login",
-        status_code=status.HTTP_303_SEE_OTHER
-    )
-
-
 @router.get("/dashboard", response_class=HTMLResponse)
 def dashboard_view(
     request: Request,

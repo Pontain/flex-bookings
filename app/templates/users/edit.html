@@ -1,53 +1,67 @@
-<!DOCTYPE html>
-<html lang="sv">
-<head>
-    <meta charset="UTF-8">
-    <title>Redigera användare</title>
-</head>
-<body>
-    <h1>Redigera användare</h1>
+{% extends "base.html" %}
 
-    <form method="post">
-        <p>
-            <label>Namn:</label><br>
-            <input type="text" name="full_name" value="{{ user.full_name }}">
-        </p>
+{% block title %}FlexBooking | Redigera användare{% endblock %}
 
-        <p>
-            <label>E-post:</label><br>
-            <input type="email" name="email" value="{{ user.email }}" required>
-        </p>
+{% block content %}
+<div class="users-page">
+    <div class="page-toolbar">
+        <div class="page-toolbar-left">
+            <h1 class="page-title">Redigera användare</h1>
+            <p class="page-description">Uppdatera användarens uppgifter.</p>
+        </div>
+    </div>
 
-        <p>
-            <label>Nytt lösenord:</label><br>
-            <input type="password" name="password">
-        </p>
+    <div class="content-card">
+        <form method="post" action="/users/{{ user.id }}/edit" class="form-dark">
+            <div class="form-group">
+                <label for="full_name">Namn</label>
+                <input 
+                    type="text" 
+                    id="full_name" 
+                    name="full_name" 
+                    value="{{ user.full_name }}" 
+                    required
+                >
+            </div>
 
-        <p>
-            <small>Lämna lösenord tomt om det inte ska ändras.</small>
-        </p>
+            <div class="form-group">
+                <label for="email">E-post</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    value="{{ user.email }}" 
+                    required
+                >
+            </div>
 
-        <p>
-            <label>Aktiv:</label>
-            <input
-                type="checkbox"
-                name="is_active"
-                {% if user.is_active %}checked{% endif %}
-            >
-        </p>
+            <div class="form-group">
+                <label for="password">Nytt lösenord</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password"
+                >
+                <small>Lämna tomt om det inte ska ändras.</small>
+            </div>
 
-        <p>
-            <label>Admin:</label>
-            <input
-                type="checkbox"
-                name="is_superuser"
-                {% if user.is_superuser %}checked{% endif %}
-            >
-        </p>
+            <div class="form-group checkbox-group">
+                <label for="is_superuser" class="checkbox-label">
+                    <input 
+                        type="checkbox" 
+                        id="is_superuser" 
+                        name="is_superuser"
+                        {% if user.is_superuser %}checked{% endif %}
+                    >
+                    Admin
+                </label>
+            </div>
 
-        <button type="submit">Spara</button>
-    </form>
-
-    <p><a href="/users">Tillbaka</a></p>
-</body>
-</html>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Spara</button>
+                <a href="/users" class="btn btn-secondary">Avbryt</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Depends, Form, status
+from fastapi import APIRouter, HTTPException, Request, Depends, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -11,6 +11,9 @@ from app.models.venue import Venue
 
 router = APIRouter()
 
+def require_admin(current_user: User):
+    if not current_user.is_superuser:
+        raise HTTPException(status_code=403, detail="Behörighet saknas")
 
 @router.get("/venues", response_class=HTMLResponse)
 def list_venues(
@@ -90,6 +93,29 @@ def create_venue_submit(
     return RedirectResponse(
         url="/venues",
         status_code=status.HTTP_303_SEE_OTHER,
+    )
+
+
+@router.get("/venues/{venue_id}/edit", response_class=HTMLResponse)
+def edit_venue_form(
+    venue_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    require_admin(current_user)
+
+    venue = db.get(Venue, venue_id)
+    if not venue:
+        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
+
+    return templates.TemplateResponse(
+        "venues/edit.html",
+        {
+            "request": request,
+            "venue": venue,
+            "current_user": current_user,
+        }
     )
 
 

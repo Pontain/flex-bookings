@@ -31,6 +31,9 @@
                 {% if current_user is defined and current_user.is_superuser %}
                     <a href="/users">Användare</a>
                 {% endif %}
+                <form action="/logout" method="post" class="logout-form">
+                    <button type="submit" class="logout-button">Logga ut</button>
+                </form>
             </nav>
         </header>
         {% endblock %}

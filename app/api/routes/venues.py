@@ -64,28 +64,6 @@ def venue_availability(
 ):
     return get_available_slots(db, venue_id, date)
 
-@router.get("/venues/{venue_id}/edit", response_class=HTMLResponse)
-def edit_venue_form(
-    venue_id: int,
-    request: Request,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    require_admin(current_user)
-
-    venue = db.get(Venue, venue_id)
-    if not venue:
-        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
-
-    return templates.TemplateResponse(
-        "venues/edit.html",
-        {
-            "request": request,
-            "venue": venue,
-            "current_user": current_user,
-        }
-    )
-
 
 @router.post("/venues/{venue_id}/edit")
 def edit_venue(
