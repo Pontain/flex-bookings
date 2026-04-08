@@ -11,21 +11,34 @@
     <div class="page-toolbar">
         <div class="page-toolbar-left">
             <h1 class="page-title">Kalender</h1>
-            <p class="page-description">Veckoöversikt över bokningar</p>
+            <p class="page-description">Veckoöversikt över bokningar.</p>
         </div>
 
-        <div class="page-toolbar-right">
-            <button id="prev-week" class="btn btn-secondary">Föregående vecka</button>
-            <button id="next-week" class="btn btn-secondary">Nästa vecka</button>
+        <div class="calendar-toolbar-actions">
+            <a href="/calendar/week" class="btn btn-primary">Veckovy</a>
+            <a href="/calendar/month" class="btn btn-secondary">Månadsvy</a>
+            <a href="/bookings/new" class="btn btn-success">Ny bokning</a>
         </div>
     </div>
 
     <div class="content-card calendar-shell">
         <div class="calendar-header-row">
+            <button id="prev-week" class="btn btn-secondary" type="button">Föregående vecka</button>
+
             <h2 id="week-label" class="calendar-week-label"></h2>
+
+            <button id="next-week" class="btn btn-secondary" type="button">Nästa vecka</button>
         </div>
 
         <div id="calendar-grid" class="calendar-grid"></div>
+    </div>
+</div>
+
+<div id="booking-modal-overlay" class="booking-modal-overlay hidden" onclick="closeBookingModal()">
+    <div id="booking-modal" class="booking-modal" onclick="event.stopPropagation()">
+        <div id="booking-modal-content">
+            <p>Laddar...</p>
+        </div>
     </div>
 </div>
 {% endblock %}

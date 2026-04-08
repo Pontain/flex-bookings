@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}FlexBooking | Månadskalender{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="/static/css/calendar.css">
+{% endblock %}
+
+{% block content %}
+<div class="calendar-page">
+    <div class="page-toolbar">
+        <div class="page-toolbar-left">
+            <h1 class="page-title">Kalender</h1>
+            <p class="page-description">Översikt över månadens bokningar.</p>
+        </div>
+
+        <div class="calendar-toolbar-actions">
+            <a href="/calendar/week" class="btn btn-secondary">Veckovy</a>
+            <a href="/calendar/month" class="btn btn-primary">Månadsvy</a>
+            <a href="/bookings/new" class="btn btn-success">Ny bokning</a>
+        </div>
+    </div>
+
+    <div class="content-card calendar-month-card">
+        <div class="calendar-month-header">
+            <div class="calendar-month-nav">
+                <a href="/calendar/month?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-secondary">
+                    ← Föregående
+                </a>
+            </div>
+
+            <div class="calendar-month-title-wrap">
+                <h2 class="calendar-month-title">{{ month_name }} {{ current_year }}</h2>
+                <a href="/calendar/month?year={{ today_year }}&month={{ today_month }}" class="calendar-today-link">
+                    Idag
+                </a>
+            </div>
+
+            <div class="calendar-month-nav">
+                <a href="/calendar/month?year={{ next_year }}&month={{ next_month }}" class="btn btn-secondary">
+                    Nästa →
+                </a>
+            </div>
+        </div>
+
+        <div class="month-grid month-grid-head">
+            <div class="month-weekday">Mån</div>
+            <div class="month-weekday">Tis</div>
+            <div class="month-weekday">Ons</div>
+            <div class="month-weekday">Tor</div>
+            <div class="month-weekday">Fre</div>
+            <div class="month-weekday">Lör</div>
+            <div class="month-weekday">Sön</div>
+        </div>
+
+        <div class="month-grid month-grid-body">
+            {% for week in weeks %}
+                {% for day in week %}
+                    <div class="month-day {% if not day.is_current_month %}month-day-muted{% endif %} {% if day.is_today %}month-day-today{% endif %}">
+                        <div class="month-day-header">
+                            <span class="month-day-number">{{ day.day_number }}</span>
+                        </div>
+
+                        <div class="month-day-bookings">
+                            {% for booking in day.bookings[:4] %}
+                                <button
+                                    type="button"
+                                    class="month-booking-chip"
+                                    onclick="openBookingModal('{{ booking.id }}')"
+                                >
+                                    <span class="month-booking-time">
+                                        {{ booking.start_time.strftime('%H:%M') }}
+                                    </span>
+                                    <span class="month-booking-title">
+                                        {{ booking.title }}
+                                    </span>
+                                </button>
+                            {% endfor %}
+
+                            {% if day.bookings|length > 4 %}
+                                <div class="month-booking-more">
+                                    +{{ day.bookings|length - 4 }} fler
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<div id="booking-modal-overlay" class="booking-modal-overlay hidden" onclick="closeBookingModal()">
+    <div id="booking-modal" class="booking-modal" onclick="event.stopPropagation()">
+        <div id="booking-modal-content">
+            <p>Laddar...</p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/calendar.js"></script>
+{% endblock %}

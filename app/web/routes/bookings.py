@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Request, Depends, Form, status
+from fastapi import APIRouter, HTTPException, Request, Depends, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 from sqlalchemy import select
@@ -215,6 +215,32 @@ def booking_detail(
 
     return templates.TemplateResponse(
         "bookings/detail.html",
+        {
+            "request": request,
+            "booking": booking,
+            "current_user": current_user,
+        },
+    )
+
+@router.get("/bookings/{booking_id}/modal", response_class=HTMLResponse)
+def booking_details_modal(
+    booking_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = db.execute(
+        select(Booking)
+        .options(selectinload(Booking.venue))
+        .where(Booking.id == booking_id)
+        .where(Booking.organization_id == current_user.organization_id)
+    ).scalar_one_or_none()
+
+    if not booking:
+        raise HTTPException(status_code=404, detail="Bokningen hittades inte")
+
+    return templates.TemplateResponse(
+        "bookings/_booking_modal_content.html",
         {
             "request": request,
             "booking": booking,

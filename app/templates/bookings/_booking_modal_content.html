@@ -1,0 +1,14 @@
+<div class="booking-modal-header">
+    <h2>{{ booking.title }}</h2>
+    <button type="button" class="modal-close-btn" onclick="closeBookingModal()">×</button>
+</div>
+
+<div class="booking-modal-body">
+    <p><strong>Lokal:</strong> {{ booking.venue.name if booking.venue else "-" }}</p>
+    <p><strong>Start:</strong> {{ booking.start_time|datetime }}</p>
+    <p><strong>Slut:</strong> {{ booking.end_time|datetime }}</p>
+    <p><strong>Kontakt:</strong> {{ booking.contact_name or "-" }}</p>
+    <p><strong>E-post:</strong> {{ booking.contact_email or "-" }}</p>
+    <p><strong>Telefon:</strong> {{ booking.contact_phone or "-" }}</p>
+    <p><strong>Beskrivning:</strong> {{ booking.description or "Ingen beskrivning." }}</p>
+</div>

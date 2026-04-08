@@ -1,5 +1,59 @@
 let currentDate = new Date();
 
+/* =========================
+   Gemensam modal-funktionalitet
+========================= */
+
+async function openBookingModal(bookingId) {
+    const overlay = document.getElementById("booking-modal-overlay");
+    const content = document.getElementById("booking-modal-content");
+
+    if (!overlay || !content) {
+        console.error("Modal-elementen hittades inte i DOM.");
+        return;
+    }
+
+    overlay.classList.remove("hidden");
+    content.innerHTML = "<p>Laddar...</p>";
+
+    try {
+        const response = await fetch(`/bookings/${bookingId}/modal`);
+
+        if (!response.ok) {
+            content.innerHTML = "<p>Kunde inte hämta bokningsdetaljer.</p>";
+            return;
+        }
+
+        const html = await response.text();
+        content.innerHTML = html;
+    } catch (error) {
+        content.innerHTML = "<p>Ett fel uppstod när bokningen skulle hämtas.</p>";
+        console.error(error);
+    }
+}
+
+function closeBookingModal() {
+    const overlay = document.getElementById("booking-modal-overlay");
+    const content = document.getElementById("booking-modal-content");
+
+    if (!overlay || !content) {
+        return;
+    }
+
+    overlay.classList.add("hidden");
+    content.innerHTML = "";
+}
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        closeBookingModal();
+    }
+});
+
+/* =========================
+   Veckovy-funktioner
+========================= */
+
 function startOfWeek(date) {
     const d = new Date(date);
     const day = d.getDay();
@@ -38,21 +92,42 @@ function formatTime(dateString) {
 }
 
 async function loadCalendar() {
+    const weekLabel = document.getElementById("week-label");
+    const calendarGrid = document.getElementById("calendar-grid");
+
+    if (!weekLabel || !calendarGrid) {
+        return;
+    }
+
     const weekStart = startOfWeek(currentDate);
     const weekEnd = endOfWeek(currentDate);
 
-    document.getElementById("week-label").textContent = formatWeekLabel(weekStart);
+    weekLabel.textContent = formatWeekLabel(weekStart);
 
-    const response = await fetch(
-        `/calendar/events?start=${encodeURIComponent(weekStart.toISOString())}&end=${encodeURIComponent(weekEnd.toISOString())}`
-    );
+    try {
+        const response = await fetch(
+            `/calendar/events?start=${encodeURIComponent(weekStart.toISOString())}&end=${encodeURIComponent(weekEnd.toISOString())}`
+        );
 
-    const events = await response.json();
-    renderCalendar(weekStart, events);
+        if (!response.ok) {
+            calendarGrid.innerHTML = "<p>Kunde inte ladda kalendern.</p>";
+            return;
+        }
+
+        const events = await response.json();
+        renderCalendar(weekStart, events);
+    } catch (error) {
+        calendarGrid.innerHTML = "<p>Ett fel uppstod när kalendern skulle laddas.</p>";
+        console.error(error);
+    }
 }
 
 function renderCalendar(weekStart, events) {
     const grid = document.getElementById("calendar-grid");
+    if (!grid) {
+        return;
+    }
+
     grid.innerHTML = "";
 
     for (let i = 0; i < 7; i++) {
@@ -64,7 +139,7 @@ function renderCalendar(weekStart, events) {
 
         const today = new Date();
         if (dayDate.toDateString() === today.toDateString()) {
-        dayColumn.classList.add("today");
+            dayColumn.classList.add("today");
         }
 
         const header = document.createElement("div");
@@ -88,8 +163,13 @@ function renderCalendar(weekStart, events) {
             body.appendChild(empty);
         } else {
             dayEvents.forEach(event => {
-                const card = document.createElement("div");
+                const card = document.createElement("button");
+                card.type = "button";
                 card.className = "calendar-booking-card";
+                card.onclick = () => {
+                console.log("Klick på bokning:", event);
+                openBookingModal(event.id);
+                };
 
                 if (event.venue_color) {
                     card.style.borderLeftColor = event.venue_color;
@@ -115,14 +195,30 @@ function renderCalendar(weekStart, events) {
     }
 }
 
-document.getElementById("prev-week").addEventListener("click", () => {
-    currentDate.setDate(currentDate.getDate() - 7);
-    loadCalendar();
-});
+/* =========================
+   Init
+========================= */
 
-document.getElementById("next-week").addEventListener("click", () => {
-    currentDate.setDate(currentDate.getDate() + 7);
-    loadCalendar();
-});
+document.addEventListener("DOMContentLoaded", () => {
+    const prevWeekBtn = document.getElementById("prev-week");
+    const nextWeekBtn = document.getElementById("next-week");
+    const calendarGrid = document.getElementById("calendar-grid");
 
-loadCalendar();
+    if (prevWeekBtn) {
+        prevWeekBtn.addEventListener("click", () => {
+            currentDate.setDate(currentDate.getDate() - 7);
+            loadCalendar();
+        });
+    }
+
+    if (nextWeekBtn) {
+        nextWeekBtn.addEventListener("click", () => {
+            currentDate.setDate(currentDate.getDate() + 7);
+            loadCalendar();
+        });
+    }
+
+    if (calendarGrid) {
+        loadCalendar();
+    }
+});

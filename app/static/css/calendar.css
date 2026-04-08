@@ -129,3 +129,222 @@
         width: 100%;
     }
 }
+
+.calendar-month-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.calendar-month-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1rem;
+}
+
+.calendar-month-title-wrap {
+    text-align: center;
+}
+
+.calendar-month-title {
+    margin: 0;
+    font-size: 1.6rem;
+}
+
+.calendar-today-link {
+    display: inline-block;
+    margin-top: 0.35rem;
+    color: var(--color-primary, #6ea8ff);
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.calendar-month-nav:first-child {
+    justify-self: start;
+}
+
+.calendar-month-nav:last-child {
+    justify-self: end;
+}
+
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.month-grid-head {
+    gap: 0.75rem;
+}
+
+.month-grid-body {
+    gap: 0.75rem;
+}
+
+.month-weekday {
+    padding: 0.75rem;
+    text-align: center;
+    font-weight: 700;
+    color: #a9b7d0;
+}
+
+.month-day {
+    min-height: 150px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.month-day-muted {
+    opacity: 0.45;
+}
+
+.month-day-today {
+    border-color: rgba(110, 168, 255, 0.7);
+    box-shadow: 0 0 0 1px rgba(110, 168, 255, 0.25);
+}
+
+.month-day-header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.month-day-number {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.month-day-bookings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+.month-booking-chip {
+    border: none;
+    width: 100%;
+    text-align: left;
+    border-radius: 10px;
+    padding: 0.5rem 0.6rem;
+    background: rgba(110, 168, 255, 0.16);
+    color: #f5f7fb;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.month-booking-chip:hover {
+    background: rgba(110, 168, 255, 0.24);
+}
+
+.month-booking-time {
+    font-size: 0.8rem;
+    color: #c9d7ef;
+}
+
+.month-booking-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.month-booking-more {
+    font-size: 0.8rem;
+    color: #a9b7d0;
+    padding: 0.25rem 0.1rem 0;
+}
+
+.booking-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 14, 24, 0.65);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    z-index: 3000;
+}
+
+.booking-modal-overlay.hidden {
+    display: none;
+}
+
+.booking-modal {
+    width: min(640px, 100%);
+    background: rgba(30, 40, 64, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 18px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.5rem;
+    color: #f5f7fb;
+}
+
+.booking-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.booking-modal-header h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.modal-close-btn {
+    border: none;
+    background: transparent;
+    color: #f5f7fb;
+    font-size: 1.8rem;
+    cursor: pointer;
+}
+
+.booking-modal-body p {
+    margin: 0.55rem 0;
+    line-height: 1.45;
+}
+
+.month-booking-chip {
+    transition: all 0.15s ease;
+}
+
+.month-booking-chip:hover {
+    transform: translateY(-1px);
+    background: rgba(110, 168, 255, 0.28);
+    cursor: pointer;
+}
+
+.month-booking-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.calendar-booking-card {
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    cursor: pointer;
+}
+
+.calendar-booking-card:hover {
+    background: rgba(255, 255, 255, 0.10);
+}
+
+.calendar-booking-card {
+    width: 100%;
+    text-align: left;
+    border: none;
+    border-left: 4px solid transparent;
+    background: rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 0.75rem;
+    cursor: pointer;
+}
