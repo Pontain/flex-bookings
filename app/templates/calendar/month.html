@@ -22,25 +22,19 @@
     </div>
 
     <div class="content-card calendar-month-card">
-        <div class="calendar-month-header">
-            <div class="calendar-month-nav">
-                <a href="/calendar/month?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-secondary">
-                    ← Föregående
-                </a>
+        <div class="calendar-nav">
+            <a href="{{ prev_month_url }}" class="btn calendar-nav-btn calendar-nav-prev">
+                ← Föregående
+            </a>
+
+            <div class="calendar-nav-center">
+                <h2 class="calendar-nav-title">{{ month_name }} {{ year }}</h2>
+                <a href="{{ current_month_url | default('/calendar/month') }}" class="calendar-today-link">Idag</a>
             </div>
 
-            <div class="calendar-month-title-wrap">
-                <h2 class="calendar-month-title">{{ month_name }} {{ current_year }}</h2>
-                <a href="/calendar/month?year={{ today_year }}&month={{ today_month }}" class="calendar-today-link">
-                    Idag
-                </a>
-            </div>
-
-            <div class="calendar-month-nav">
-                <a href="/calendar/month?year={{ next_year }}&month={{ next_month }}" class="btn btn-secondary">
-                    Nästa →
-                </a>
-            </div>
+            <a href="{{ next_month_url }}" class="btn calendar-nav-btn calendar-nav-next">
+                Nästa →
+            </a>
         </div>
 
         <div class="month-grid month-grid-head">
@@ -97,7 +91,6 @@
         </div>
     </div>
 </div>
-
 {% endblock %}
 
 {% block extra_js %}

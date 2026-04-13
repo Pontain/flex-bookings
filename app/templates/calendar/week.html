@@ -22,12 +22,26 @@
     </div>
 
     <div class="content-card calendar-shell">
-        <div class="calendar-header-row">
-            <button id="prev-week" class="btn btn-secondary" type="button">Föregående vecka</button>
+        <div class="calendar-nav">
+            <button
+                id="prev-week"
+                class="btn calendar-nav-btn calendar-nav-prev"
+                type="button"
+            >
+                ← Föregående
+            </button>
 
-            <h2 id="week-label" class="calendar-week-label"></h2>
+            <div class="calendar-nav-center">
+                <h2 id="week-label" class="calendar-nav-title"></h2>
+            </div>
 
-            <button id="next-week" class="btn btn-secondary" type="button">Nästa vecka</button>
+            <button
+                id="next-week"
+                class="btn calendar-nav-btn calendar-nav-next"
+                type="button"
+            >
+                Nästa →
+            </button>
         </div>
 
         <div id="calendar-grid" class="calendar-grid"></div>
