@@ -1,5 +1,5 @@
 from datetime import date, datetime, timedelta
-import calendar
+import calendar as py_calendar
 
 from fastapi import APIRouter, Request, Depends, Query
 from fastapi.responses import HTMLResponse
@@ -38,7 +38,7 @@ def calendar_month(
 
     # Första och sista dagen i vald månad
     month_start = date(current_year, current_month, 1)
-    _, days_in_month = calendar.monthrange(current_year, current_month)
+    _, days_in_month = py_calendar.monthrange(current_year, current_month)
     month_end = date(current_year, current_month, days_in_month)
 
     # Kalendern ska börja på måndag och sluta på söndag
@@ -93,9 +93,11 @@ def calendar_month(
             "request": request,
             "current_user": current_user,
             "weeks": weeks,
+            "month": current_month,
+            "year": current_year,
             "current_year": current_year,
             "current_month": current_month,
-            "month_name": calendar.month_name[current_month],
+            "month_name": py_calendar.month_name[current_month],
             "prev_year": prev_month_date.year,
             "prev_month": prev_month_date.month,
             "next_year": next_month_date.year,

@@ -12,7 +12,7 @@ print("Import Calendar")
 from app.api.routes import calendar as api_calendar
 
 print("Import Web Calendar")
-from app.web.routes import calendar as web_calendar
+from app.web.routes import web_calendar as web_calendar
 print("Import Web Dashboard")
 from app.web.routes import dashboard as web_dashboard
 print("Import Web Auth")

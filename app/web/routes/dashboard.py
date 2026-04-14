@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Request, Depends, status
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
+from fastapi import APIRouter, Request, Depends
+from fastapi.responses import HTMLResponse
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
@@ -20,7 +19,7 @@ router = APIRouter()
 def dashboard_view(
     request: Request,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     now = datetime.now()
 
@@ -32,21 +31,25 @@ def dashboard_view(
     end_of_week = start_of_week + timedelta(days=7)
 
     bookings_today = db.query(func.count(Booking.id)).filter(
+        Booking.organization_id == current_user.organization_id,
         Booking.start_time >= start_of_today,
-        Booking.start_time < end_of_today
+        Booking.start_time < end_of_today,
     ).scalar() or 0
 
     bookings_this_week = db.query(func.count(Booking.id)).filter(
+        Booking.organization_id == current_user.organization_id,
         Booking.start_time >= start_of_week,
-        Booking.start_time < end_of_week
+        Booking.start_time < end_of_week,
     ).scalar() or 0
 
     active_venues = db.query(func.count(Venue.id)).filter(
-        Venue.is_active == True
+        Venue.organization_id == current_user.organization_id,
+        Venue.is_active == True,
     ).scalar() or 0
 
     next_booking = db.query(Booking).filter(
-        Booking.start_time >= now
+        Booking.organization_id == current_user.organization_id,
+        Booking.start_time >= now,
     ).order_by(Booking.start_time.asc()).first()
 
     return templates.TemplateResponse(

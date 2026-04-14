@@ -23,18 +23,39 @@
 
     <div class="content-card calendar-month-card">
         <div class="calendar-nav">
-            <a href="{{ prev_month_url }}" class="btn calendar-nav-btn calendar-nav-prev">
+            <button
+                id="prev-month"
+                class="btn calendar-nav-btn calendar-nav-prev"
+                type="button"
+            >
                 ← Föregående
-            </a>
+            </button>
 
             <div class="calendar-nav-center">
-                <h2 class="calendar-nav-title">{{ month_name }} {{ year }}</h2>
-                <a href="{{ current_month_url | default('/calendar/month') }}" class="calendar-today-link">Idag</a>
+                <h2
+                    id="month-label"
+                    class="calendar-nav-title"
+                    data-year="{{ year }}"
+                    data-month="{{ month }}"
+                >
+                    {{ month_name }} {{ year }}
+                </h2>
+                <button
+                    id="today-month"
+                    class="btn calendar-today-btn"
+                    type="button"
+                >
+                    Idag
+                </button>
             </div>
 
-            <a href="{{ next_month_url }}" class="btn calendar-nav-btn calendar-nav-next">
+            <button
+                id="next-month"
+                class="btn calendar-nav-btn calendar-nav-next"
+                type="button"
+            >
                 Nästa →
-            </a>
+            </button>
         </div>
 
         <div class="month-grid month-grid-head">

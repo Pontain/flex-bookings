@@ -13,17 +13,34 @@
     <div class="page-shell">
         <div class="glass-card">
             <div class="hero-block">
-                <h1>FlexBooking</h1>
-                <p class="lead">
-                    Ett enkelt bokningssystem för föreningar, lokaler och aktiviteter.
-                </p>
-                <p class="subtext">
-                    Hantera bokningar, lokaler och användare i ett och samma system.
-                </p>
+                <div class="hero-content">
+                    <h1>FlexBooking</h1>
+                    <p class="lead">
+                        Ett enkelt bokningssystem för föreningar, lokaler och aktiviteter.
+                    </p>
+                    <p class="subtext">
+                        Hantera bokningar, lokaler och användare i ett och samma system.
+                    </p>
+                </div>
+
+                <div class="hero-actions">
+                    <a href="/register" class="btn btn-secondary">Skapa konto</a>
+                    <button type="button" class="btn btn-ghost" disabled>FAQ</button>
+                </div>
             </div>
 
             <div class="login-block">
                 <h2>Logga in</h2>
+
+                {% if error %}
+                    <div class="form-error">{{ error }}</div>
+                {% endif %}
+
+                {% if created %}
+                    <div class="form-success">
+                        Konto skapat! Du kan nu logga in.
+                    </div>
+                {% endif %}
 
                 <form method="post" action="/login" class="login-form">
                     <label for="email">E-post</label>

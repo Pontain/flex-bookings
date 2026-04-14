@@ -196,6 +196,48 @@ function renderCalendar(weekStart, events) {
 }
 
 /* =========================
+   Månadsvy-funktioner
+========================= */
+
+const monthLabel = document.getElementById("month-label");
+const prevMonthBtn = document.getElementById("prev-month");
+const nextMonthBtn = document.getElementById("next-month");
+
+if (monthLabel && prevMonthBtn && nextMonthBtn) {
+    const currentYear = parseInt(monthLabel.dataset.year, 10);
+    const currentMonth = parseInt(monthLabel.dataset.month, 10);
+
+    function goToMonth(year, month) {
+        window.location.href = `/calendar/month?year=${year}&month=${month}`;
+    }
+
+    prevMonthBtn.addEventListener("click", () => {
+        let year = currentYear;
+        let month = currentMonth - 1;
+
+        if (month < 1) {
+            month = 12;
+            year -= 1;
+        }
+
+        goToMonth(year, month);
+    });
+
+    nextMonthBtn.addEventListener("click", () => {
+        let year = currentYear;
+        let month = currentMonth + 1;
+
+        if (month > 12) {
+            month = 1;
+            year += 1;
+        }
+
+        goToMonth(year, month);
+    });
+}
+
+
+/* =========================
    Init
 ========================= */
 
