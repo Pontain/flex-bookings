@@ -171,7 +171,6 @@
     align-items: stretch;
 }
 
-.hero-block,
-.login-block {
+.hero-block {
     height: 100%;
 }
