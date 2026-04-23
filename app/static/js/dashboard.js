@@ -14,6 +14,56 @@ function formatTime(dateString) {
     });
 }
 
+/* =========================
+   Modal-funktionalitet
+========================= */
+
+async function openBookingModal(bookingId) {
+    const overlay = document.getElementById("booking-modal-overlay");
+    const content = document.getElementById("booking-modal-content");
+
+    if (!overlay || !content) {
+        console.error("Modal-elementen hittades inte i DOM.");
+        return;
+    }
+
+    overlay.classList.remove("hidden");
+    content.innerHTML = "<p>Laddar...</p>";
+
+    try {
+        const response = await fetch(`/bookings/${bookingId}/modal`);
+
+        if (!response.ok) {
+            content.innerHTML = "<p>Kunde inte hämta bokningsdetaljer.</p>";
+            return;
+        }
+
+        const html = await response.text();
+        content.innerHTML = html;
+    } catch (error) {
+        content.innerHTML = "<p>Ett fel uppstod när bokningen skulle hämtas.</p>";
+        console.error(error);
+    }
+}
+
+function closeBookingModal() {
+    const overlay = document.getElementById("booking-modal-overlay");
+    const content = document.getElementById("booking-modal-content");
+
+    if (!overlay || !content) {
+        return;
+    }
+
+    overlay.classList.add("hidden");
+    content.innerHTML = "";
+}
+
+document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape") {
+        closeBookingModal();
+    }
+});
+
 async function loadDashboardCalendar() {
     const config = window.dashboardCalendarConfig;
 
@@ -27,6 +77,10 @@ async function loadDashboardCalendar() {
 
 function renderDashboardCalendar(startString, events) {
     const container = document.getElementById("dashboard-calendar");
+    if (!container) {
+        return;
+    }
+
     container.innerHTML = "";
 
     const weekStart = new Date(startString);
@@ -59,8 +113,10 @@ function renderDashboardCalendar(startString, events) {
             body.appendChild(empty);
         } else {
             dayEvents.forEach(event => {
-                const card = document.createElement("div");
+                const card = document.createElement("button");
+                card.type = "button";
                 card.className = "dashboard-booking-card";
+                card.onclick = () => openBookingModal(event.id);
 
                 if (event.venue_color) {
                     card.style.borderLeftColor = event.venue_color;
@@ -82,4 +138,6 @@ function renderDashboardCalendar(startString, events) {
     }
 }
 
-loadDashboardCalendar();
+document.addEventListener("DOMContentLoaded", () => {
+    loadDashboardCalendar();
+});

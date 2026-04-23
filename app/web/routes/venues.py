@@ -59,6 +59,7 @@ def create_venue_submit(
     name: str = Form(...),
     description: str | None = Form(None),
     capacity: int | None = Form(None),
+    color: str | None = Form("#3b82f6"),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -66,7 +67,7 @@ def create_venue_submit(
         "name": name,
         "description": description or "",
         "capacity": capacity or "",
-    }
+        "color": color or "#3b82f6"}
 
     if not name.strip():
         return templates.TemplateResponse(
@@ -85,6 +86,7 @@ def create_venue_submit(
         name=name.strip(),
         description=description or None,
         capacity=capacity,
+        color=color or "#3b82f6",
     )
 
     db.add(venue)
@@ -117,6 +119,54 @@ def edit_venue_form(
             "current_user": current_user,
         }
     )
+
+@router.post("/venues/{venue_id}/edit")
+def edit_venue_submit(
+    venue_id: int,
+    request: Request,
+    name: str = Form(...),
+    description: str | None = Form(None),
+    capacity: int | None = Form(None),
+    color: str | None = Form("#3b82f6"),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    require_admin(current_user)
+
+    venue = db.scalar(
+        select(Venue).where(
+            Venue.id == venue_id,
+            Venue.organization_id == current_user.organization_id,
+        )
+    )
+
+    if not venue:
+        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
+
+    if not name.strip():
+        return templates.TemplateResponse(
+            "venues/edit.html",
+            {
+                "request": request,
+                "venue": venue,
+                "error": "Namn krävs",
+                "current_user": current_user,
+            },
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+
+    venue.name = name.strip()
+    venue.description = description or None
+    venue.capacity = capacity
+    venue.color = color or "#3b82f6"
+
+    db.commit()
+
+    return RedirectResponse(
+        url="/venues",
+        status_code=status.HTTP_303_SEE_OTHER,
+    )
+
 
 
 @router.post("/venues/{venue_id}/delete")

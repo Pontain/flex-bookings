@@ -4,6 +4,7 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/dashboard.css">
+<link rel="stylesheet" href="/static/css/calendar.css">
 {% endblock %}
 
 {% block content %}
@@ -25,6 +26,7 @@
         <div class="stats-card">
             <h2>Bokningar idag</h2>
             <p class="stats-number">{{ bookings_today }}</p>
+        
         </div>
 
         <div class="stats-card">
@@ -62,6 +64,15 @@
         <div id="dashboard-calendar" class="dashboard-calendar"></div>
     </section>
 </div>
+
+<div id="booking-modal-overlay" class="booking-modal-overlay hidden" onclick="closeBookingModal()">
+    <div id="booking-modal" class="booking-modal" onclick="event.stopPropagation()">
+        <div id="booking-modal-content">
+            <p>Laddar...</p>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}

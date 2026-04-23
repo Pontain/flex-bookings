@@ -82,11 +82,36 @@
 }
 
 .dashboard-booking-card {
-    padding: 0.85rem 0.9rem;
+    display: block;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    padding: 0.85rem;
     border-radius: 14px;
+
+    /* 🧊 Glass-bakgrund */
+    background: rgba(255, 255, 255, 0.06);
+
+    /* kant + färgstripe */
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 4px solid transparent;
+
+    /* mjuk övergång */
+    transition: all 0.2s ease;
+
+    color: inherit;
+    font: inherit;
+}
+
+.dashboard-booking-card:hover {
+    background: rgba(255, 255, 255, 0.10);
+    transform: translateY(-1px);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.dashboard-booking-card:active {
+    transform: translateY(0);
     background: rgba(255, 255, 255, 0.12);
-    border-left: 4px solid var(--accent-primary);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .booking-title {

@@ -25,18 +25,19 @@ def create_booking(db: Session, booking_data: BookingCreate, organization_id: in
         )
 
     venue = db.scalar(
-    select(Venue).where(
-        Venue.id == booking_data.venue_id,
-        Venue.organization_id == booking_data.organization_id
+        select(Venue).where(
+            Venue.id == booking_data.venue_id,
+            Venue.organization_id == organization_id
+        )
     )
-)
+
     if not venue:
-        raise VenueNotFoundError("Venue not found.")
+        raise VenueNotFoundError("Lokalen hittades inte.")
 
     overlapping_booking = db.execute(
         select(Booking).where(
             Booking.venue_id == booking_data.venue_id,
-            Booking.status != "cancelled",
+            Booking.status != "Avbruten",
             booking_data.start_time < Booking.end_time,
             booking_data.end_time > Booking.start_time,
         )
@@ -44,7 +45,7 @@ def create_booking(db: Session, booking_data: BookingCreate, organization_id: in
 
     if overlapping_booking:
         raise BookingConflictError(
-            "This venue is already booked during the requested time."
+            "Lokalen är redan bokad under den efterfrågade tiden."
         )
 
     booking = Booking(
@@ -57,7 +58,7 @@ def create_booking(db: Session, booking_data: BookingCreate, organization_id: in
         contact_phone=booking_data.contact_phone,
         start_time=booking_data.start_time,
         end_time=booking_data.end_time,
-        status="confirmed",
+        status="Bokad",
     )
 
     db.add(booking)

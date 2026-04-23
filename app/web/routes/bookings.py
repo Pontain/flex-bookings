@@ -79,6 +79,7 @@ def create_booking_form(
     )
 
 
+
 @router.post("/bookings/new", response_class=HTMLResponse)
 def create_booking_submit(
     request: Request,
@@ -88,8 +89,11 @@ def create_booking_submit(
     contact_name: str = Form(...),
     contact_email: str = Form(...),
     contact_phone: str | None = Form(None),
-    start_time: str = Form(...),
-    end_time: str = Form(...),
+    booking_date: str = Form(...),
+    start_hour: str = Form(...),
+    start_minute: str = Form(...),
+    end_hour: str = Form(...),
+    end_minute: str = Form(...),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -106,11 +110,58 @@ def create_booking_submit(
         "contact_name": contact_name,
         "contact_email": contact_email,
         "contact_phone": contact_phone or "",
-        "start_time": start_time,
-        "end_time": end_time,
+        "booking_date": booking_date,
+        "start_hour": start_hour,
+        "start_minute": start_minute,
+        "end_hour": end_hour,
+        "end_minute": end_minute,
     }
 
     try:
+        start_hour = start_hour.strip().zfill(2)
+        start_minute = start_minute.strip().zfill(2)
+        end_hour = end_hour.strip().zfill(2)
+        end_minute = end_minute.strip().zfill(2)
+
+        start_hour_int = int(start_hour)
+        start_minute_int = int(start_minute)
+        end_hour_int = int(end_hour)
+        end_minute_int = int(end_minute)
+
+        if not (0 <= start_hour_int <= 23):
+            raise ValueError("Starttimmen måste vara mellan 00 och 23.")
+
+        if not (0 <= start_minute_int <= 59):
+            raise ValueError("Startminuten måste vara mellan 00 och 59.")
+
+        if not (0 <= end_hour_int <= 23):
+            raise ValueError("Sluttimmen måste vara mellan 00 och 23.")
+
+        if not (0 <= end_minute_int <= 59):
+            raise ValueError("Slutminuten måste vara mellan 00 och 59.")
+
+        start_time = datetime.strptime(
+            f"{booking_date} {start_hour}:{start_minute}",
+            "%Y-%m-%d %H:%M"
+        )
+        end_time = datetime.strptime(
+            f"{booking_date} {end_hour}:{end_minute}",
+            "%Y-%m-%d %H:%M"
+        )
+
+        if end_time <= start_time:
+            return templates.TemplateResponse(
+                "bookings/create.html",
+                {
+                    "request": request,
+                    "venues": venues,
+                    "error": "Sluttiden måste vara senare än starttiden.",
+                    "form_data": form_data,
+                    "current_user": current_user,
+                },
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
         booking_data = BookingCreate(
             venue_id=venue_id,
             title=title,
@@ -118,19 +169,20 @@ def create_booking_submit(
             contact_name=contact_name,
             contact_email=contact_email,
             contact_phone=contact_phone or None,
-            start_time=datetime.fromisoformat(start_time),
-            end_time=datetime.fromisoformat(end_time),
+            start_time=start_time,
+            end_time=end_time,
         )
 
-        booking = create_booking(db, booking_data)
+        booking = create_booking(db, booking_data, current_user.organization_id)
 
-    except ValueError:
+    except ValueError as e:
+        error_message = str(e) if str(e) else "Ogiltigt datum eller tid."
         return templates.TemplateResponse(
             "bookings/create.html",
             {
                 "request": request,
                 "venues": venues,
-                "error": "Ogiltigt datumformat.",
+                "error": error_message,
                 "form_data": form_data,
                 "current_user": current_user,
             },
@@ -184,7 +236,6 @@ def create_booking_submit(
         url=f"/bookings/{booking.id}",
         status_code=status.HTTP_303_SEE_OTHER,
     )
-
 
 @router.get("/bookings/{booking_id}", response_class=HTMLResponse)
 def booking_detail(

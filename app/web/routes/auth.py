@@ -150,3 +150,10 @@ def logout(request: Request):
         url="/login",
         status_code=status.HTTP_303_SEE_OTHER
     )
+
+@router.get("/faq", response_class=HTMLResponse)
+def faq_page(request: Request):
+    return templates.TemplateResponse(
+        "pages/faq.html",
+        {"request": request}
+    )

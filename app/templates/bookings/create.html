@@ -21,7 +21,7 @@
             <option value="">Välj lokal</option>
             {% for venue in venues %}
             <option value="{{ venue.id }}"
-                {% if form_data.get('venue_id') == venue.id %}selected{% endif %}>
+                {% if form_data.get('venue_id')|string == venue.id|string %}selected{% endif %}>
                 {{ venue.name }}
             </option>
             {% endfor %}
@@ -55,15 +55,86 @@
 
     <div class="booking-form-grid">
         <span>
-            <label for="start_time">Starttid</label>
-            <input id="start_time" type="datetime-local" name="start_time" value="{{ form_data.get('start_time', '') }}" required>
+            <label for="booking_date">Datum</label>
+            <input
+                id="booking_date"
+                type="date"
+                name="booking_date"
+                value="{{ form_data.get('booking_date', '') }}"
+                required
+            >
         </span>
 
         <span>
-            <label for="end_time">Sluttid</label>
-            <input id="end_time" type="datetime-local" name="end_time" value="{{ form_data.get('end_time', '') }}" required>
+            <label>Starttid</label>
+            <div class="time-row">
+                <input
+                    id="start_hour"
+                    type="text"
+                    name="start_hour"
+                    list="hours-list"
+                    inputmode="numeric"
+                    placeholder="HH"
+                    maxlength="2"
+                    value="{{ form_data.get('start_hour', '') }}"
+                    required
+                >
+                <span class="time-separator">:</span>
+                <input
+                    id="start_minute"
+                    type="text"
+                    name="start_minute"
+                    list="minutes-list"
+                    inputmode="numeric"
+                    placeholder="MM"
+                    maxlength="2"
+                    value="{{ form_data.get('start_minute', '') }}"
+                    required
+                >
+            </div>
+        </span>
+
+        <span>
+            <label>Sluttid</label>
+            <div class="time-row">
+                <input
+                    id="end_hour"
+                    type="text"
+                    name="end_hour"
+                    list="hours-list"
+                    inputmode="numeric"
+                    placeholder="HH"
+                    maxlength="2"
+                    value="{{ form_data.get('end_hour', '') }}"
+                    required
+                >
+                <span class="time-separator">:</span>
+                <input
+                    id="end_minute"
+                    type="text"
+                    name="end_minute"
+                    list="minutes-list"
+                    inputmode="numeric"
+                    placeholder="MM"
+                    maxlength="2"
+                    value="{{ form_data.get('end_minute', '') }}"
+                    required
+                >
+            </div>
         </span>
     </div>
+
+    <datalist id="hours-list">
+        {% for h in range(24) %}
+        <option value="{{ '%02d' % h }}"></option>
+        {% endfor %}
+    </datalist>
+
+    <datalist id="minutes-list">
+        {% for m in range(60) %}
+        <option value="{{ '%02d' % m }}"></option>
+        {% endfor %}
+    </datalist>
 
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">Spara bokning</button>

@@ -1,0 +1,53 @@
+{% extends "public_base.html" %}
+
+{% block title %}FlexBooking | FAQ{% endblock %}
+
+{% block content %}
+<div class="users-page">
+    <div class="page-toolbar">
+        <div class="page-toolbar-left">
+            <h1 class="page-title">Vanliga frågor</h1>
+            <p class="page-description">
+                Här hittar du svar på de vanligaste frågorna om FlexBooking.
+            </p>
+        </div>
+    </div>
+
+    <div class="content-card faq-card">
+
+        <div class="faq-item">
+            <h3>Vad är FlexBooking?</h3>
+            <p>
+                FlexBooking är ett bokningssystem för föreningar och organisationer
+                där du kan hantera lokaler, bokningar och användare.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>Hur skapar jag en bokning?</h3>
+            <p>
+                Gå till "Ny bokning" i menyn och fyll i formuläret.
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>Kan jag bjuda in fler användare?</h3>
+            <p>
+                Ja, administratörer kan lägga till nya användare under "Användare".
+            </p>
+        </div>
+
+        <div class="faq-item">
+            <h3>Vad händer om två bokningar krockar?</h3>
+            <p>
+                Systemet förhindrar dubbelbokningar och visar ett felmeddelande.
+            </p>
+        </div>
+
+    </div>
+
+    <div style="margin-top: 1.5rem;">
+        <a href="/login" class="btn btn-secondary">Tillbaka</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,7 +1,6 @@
 from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.responses import RedirectResponse
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -63,29 +62,3 @@ def venue_availability(
     db: Session = Depends(get_db)
 ):
     return get_available_slots(db, venue_id, date)
-
-
-@router.post("/venues/{venue_id}/edit")
-def edit_venue(
-    venue_id: int,
-    name: str = Form(...),
-    description: str = Form(""),
-    capacity: int = Form(...),
-    color: str = Form("#5f73ff"),
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    require_admin(current_user)
-
-    venue = db.get(Venue, venue_id)
-    if not venue:
-        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
-
-    venue.name = name
-    venue.description = description if description else None
-    venue.capacity = capacity
-    venue.color = color
-
-    db.commit()
-
-    return RedirectResponse(url="/venues", status_code=303)
