@@ -1,3 +1,7 @@
+/* =========================
+   DASHBOARD - GRUND
+   ========================= */
+
 .dashboard-page {
     display: flex;
     flex-direction: column;
@@ -29,6 +33,11 @@
     color: var(--text-main);
 }
 
+
+/* =========================
+   DASHBOARD - KALENDERPANEL
+   ========================= */
+
 .calendar-panel {
     padding: 1.5rem;
 }
@@ -49,32 +58,72 @@
     padding-bottom: 0.25rem;
 }
 
+
+/* =========================
+   DASHBOARD - VECKODAGAR
+   ========================= */
+
 .dashboard-day {
-    min-height: 320px;
+    height: 340px;
+    max-height: 340px;
+    min-height: 0;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
     border-radius: 18px;
     background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.10);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
 }
 
 .dashboard-day-header {
+    flex-shrink: 0;
+
     padding: 0.9rem 1rem;
     font-weight: 600;
     color: var(--text-main);
+
     background: rgba(255, 255, 255, 0.08);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
     text-transform: capitalize;
 }
 
 .dashboard-day-body {
-    padding: 0.9rem;
+    flex: 1;
+    min-height: 0;
+
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    flex: 1;
+
+    padding: 0.9rem;
+    padding-right: 0.4rem;
+
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
 }
+
+.dashboard-day-body::-webkit-scrollbar {
+    width: 6px;
+}
+
+.dashboard-day-body::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 999px;
+}
+
+.dashboard-day-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+/* =========================
+   DASHBOARD - BOKNINGAR
+   ========================= */
 
 .dashboard-empty {
     color: var(--text-muted);
@@ -84,23 +133,24 @@
 .dashboard-booking-card {
     display: block;
     width: 100%;
-    text-align: left;
-    cursor: pointer;
+
     padding: 0.85rem;
     border-radius: 14px;
 
-    /* 🧊 Glass-bakgrund */
-    background: rgba(255, 255, 255, 0.06);
+    text-align: left;
+    cursor: pointer;
 
-    /* kant + färgstripe */
+    background: rgba(255, 255, 255, 0.06);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-left: 4px solid transparent;
 
-    /* mjuk övergång */
-    transition: all 0.2s ease;
-
     color: inherit;
     font: inherit;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        border-color 0.2s ease;
 }
 
 .dashboard-booking-card:hover {
@@ -115,21 +165,26 @@
 }
 
 .booking-title {
+    margin-bottom: 0.25rem;
     font-weight: 700;
     color: var(--text-main);
-    margin-bottom: 0.25rem;
 }
 
 .booking-time {
+    margin-bottom: 0.15rem;
     color: var(--text-soft);
     font-size: 0.95rem;
-    margin-bottom: 0.15rem;
 }
 
 .booking-contact {
     color: var(--text-muted);
     font-size: 0.9rem;
 }
+
+
+/* =========================
+   RESPONSIVE
+   ========================= */
 
 @media (max-width: 900px) {
     .dashboard-header,
@@ -153,7 +208,8 @@
     }
 
     .dashboard-day {
-        min-height: auto;
+        height: 340px;
+        max-height: 340px;
     }
 
     .dashboard-actions .btn {

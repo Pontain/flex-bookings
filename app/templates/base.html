@@ -29,6 +29,7 @@
             <nav class="main-nav">
                 <a href="/dashboard">Översikt</a>
                 <a href="/calendar/month">Kalender</a>
+                <a href="/bookings">Bokningar</a>
                 <a href="/bookings/new">Ny bokning</a>
                 <a href="/venues">Lokaler</a>
                 {% if current_user is defined and current_user.is_superuser %}
@@ -45,6 +46,8 @@
             {% block content %}{% endblock %}
         </main>
     </div>
+
+    <script src="/static/js/scripts.js"></script>
 
     {% block extra_js %}{% endblock %}
 </body>

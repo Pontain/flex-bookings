@@ -146,8 +146,21 @@ function renderCalendar(weekStart, events) {
         header.className = "calendar-day-header";
         header.textContent = formatDateLabel(dayDate);
 
+        const bodyWrapper = document.createElement("div");
+        bodyWrapper.className = "calendar-day-body-wrapper";
+
+        const scrollUp = document.createElement("button");
+        scrollUp.type = "button";
+        scrollUp.className = "scroll-btn scroll-up";
+        scrollUp.textContent = "▲";
+
         const body = document.createElement("div");
         body.className = "calendar-day-body";
+
+        const scrollDown = document.createElement("button");
+        scrollDown.type = "button";
+        scrollDown.className = "scroll-btn scroll-down";
+        scrollDown.textContent = "▼";
 
         const dayEvents = events
             .filter(event => {
@@ -189,8 +202,32 @@ function renderCalendar(weekStart, events) {
             });
         }
 
+        bodyWrapper.appendChild(scrollUp);
+        bodyWrapper.appendChild(body);
+        bodyWrapper.appendChild(scrollDown);
+
+        scrollUp.addEventListener("click", () => {
+            body.scrollBy({ top: -80, behavior: "smooth" });
+        });
+
+        scrollDown.addEventListener("click", () => {
+            body.scrollBy({ top: 80, behavior: "smooth" });
+        });
+
+        const updateScrollButtons = () => {
+            scrollUp.style.display = body.scrollTop > 0 ? "block" : "none";
+            scrollDown.style.display =
+                body.scrollTop + body.clientHeight < body.scrollHeight
+                    ? "block"
+                    : "none";
+        };
+
+        body.addEventListener("scroll", updateScrollButtons);
+
+        setTimeout(updateScrollButtons, 0);
+
         dayColumn.appendChild(header);
-        dayColumn.appendChild(body);
+        dayColumn.appendChild(bodyWrapper);
         grid.appendChild(dayColumn);
     }
 }
@@ -245,6 +282,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const prevWeekBtn = document.getElementById("prev-week");
     const nextWeekBtn = document.getElementById("next-week");
     const calendarGrid = document.getElementById("calendar-grid");
+
+    document.querySelectorAll("[data-venue-color]").forEach((element) => {
+        element.style.borderLeft = `4px solid ${element.dataset.venueColor}`;
+    });
 
     if (prevWeekBtn) {
         prevWeekBtn.addEventListener("click", () => {

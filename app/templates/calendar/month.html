@@ -77,11 +77,12 @@
                         </div>
 
                         <div class="month-day-bookings">
-                            {% for booking in day.bookings[:4] %}
+                            {% for booking in day.bookings %}
                                 <button
                                     type="button"
                                     class="month-booking-chip"
                                     onclick="openBookingModal('{{ booking.id }}')"
+                                    data-venue-color="{{ booking.venue.color or '#5f73ff' }}"
                                 >
                                     <span class="month-booking-time">
                                         {{ booking.start_time.strftime('%H:%M') }}
@@ -92,11 +93,6 @@
                                 </button>
                             {% endfor %}
 
-                            {% if day.bookings|length > 4 %}
-                                <div class="month-booking-more">
-                                    +{{ day.bookings|length - 4 }} fler
-                                </div>
-                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
