@@ -1,7 +1,11 @@
+from dotenv import load_dotenv
+
 from fastapi import FastAPI
 from starlette.middleware.sessions import SessionMiddleware
 import os
 from fastapi.staticfiles import StaticFiles
+
+load_dotenv()
 
 
 print("Import Bookings")

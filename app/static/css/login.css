@@ -177,3 +177,16 @@
 .hero-block {
     height: 100%;
 }
+
+.forgot-password-link {
+    display: inline-block;
+    margin-top: 0.45rem;
+    font-size: 0.9rem;
+    color: #93c5fd;
+    text-decoration: none;
+}
+
+.forgot-password-link:hover {
+    color: #bfdbfe;
+    text-decoration: underline;
+}
