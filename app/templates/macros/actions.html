@@ -1,15 +1,29 @@
-{% macro row_actions(edit_href=None, delete_action=None, delete_message="Är du säker?") %}
+{% macro row_actions(
+    user_id=None,
+    current_user_id=None,
+    edit_href=None,
+    delete_action=None,
+    delete_message="Är du säker?"
+) %}
 <div class="table-actions">
     {% if edit_href %}
-        <a href="{{ edit_href }}" class="btn btn-secondary">Redigera</a>
+        <a href="{{ edit_href }}" class="btn btn-secondary btn-sm">
+            Redigera
+        </a>
     {% endif %}
 
-    {% if delete_action %}
+    {% if user_id != current_user_id and delete_action %}
         <form method="post"
               action="{{ delete_action }}"
               onsubmit="return confirm('{{ delete_message }}');">
-            <button type="submit" class="btn btn-danger">Ta bort</button>
+            <button type="submit" class="btn btn-danger btn-sm">
+                Ta bort
+            </button>
         </form>
+    {% endif %}
+
+    {% if user_id == current_user_id %}
+        <span class="text-muted">(du)</span>
     {% endif %}
 </div>
 {% endmacro %}

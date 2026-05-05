@@ -163,7 +163,6 @@ def edit_user(
     full_name: str = Form(""),
     email: str = Form(...),
     password: str = Form(""),
-    is_active: str = Form(None),
     is_superuser: str = Form(None),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -185,19 +184,27 @@ def edit_user(
 
     existing_user = (
         db.query(User)
-        .filter(User.email == email, User.id != user_id)
+        .filter(
+            User.email == email,
+            User.id != user_id,
+            User.organization_id == current_user.organization_id,
+        )
         .first()
     )
+
     if existing_user:
         raise HTTPException(status_code=400, detail="E-post finns redan")
 
-    user.full_name = full_name
-    user.email = email
-    user.is_active = True if is_active else False
-    user.is_superuser = True if is_superuser else False
+    user.full_name = full_name.strip()
+    user.email = email.strip()
 
-    if password:
-        user.hashed_password = hash_password(password)
+    # Eget konto ska inte kunna råka förlora admin via formuläret
+    if user.id != current_user.id:
+        user.is_superuser = True if is_superuser else False
+
+    # Ändra bara lösenord om något faktiskt skrivits in
+    if password and password.strip():
+        user.hashed_password = hash_password(password.strip())
 
     membership = (
         db.query(OrganizationMember)
@@ -207,6 +214,7 @@ def edit_user(
         )
         .first()
     )
+
     if membership:
         membership.role = "admin" if user.is_superuser else "member"
 

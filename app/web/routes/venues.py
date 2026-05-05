@@ -97,7 +97,9 @@ def create_venue_submit(
         status_code=status.HTTP_303_SEE_OTHER,
     )
 
-
+# =========================
+# EDIT (GET)
+# =========================
 @router.get("/venues/{venue_id}/edit", response_class=HTMLResponse)
 def edit_venue_form(
     venue_id: int,
@@ -107,9 +109,18 @@ def edit_venue_form(
 ):
     require_admin(current_user)
 
-    venue = db.get(Venue, venue_id)
+    venue = db.scalar(
+        select(Venue).where(
+            Venue.id == venue_id,
+            Venue.organization_id == current_user.organization_id,
+        )
+    )
+
     if not venue:
-        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Lokalen hittades inte",
+        )
 
     return templates.TemplateResponse(
         "venues/edit.html",
@@ -117,9 +128,13 @@ def edit_venue_form(
             "request": request,
             "venue": venue,
             "current_user": current_user,
-        }
+        },
     )
 
+
+# =========================
+# EDIT (POST)
+# =========================
 @router.post("/venues/{venue_id}/edit")
 def edit_venue_submit(
     venue_id: int,
@@ -141,7 +156,10 @@ def edit_venue_submit(
     )
 
     if not venue:
-        raise HTTPException(status_code=404, detail="Lokalen hittades inte")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Lokalen hittades inte",
+        )
 
     if not name.strip():
         return templates.TemplateResponse(
@@ -168,13 +186,17 @@ def edit_venue_submit(
     )
 
 
-
+# =========================
+# DELETE
+# =========================
 @router.post("/venues/{venue_id}/delete")
 def delete_venue(
     venue_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    require_admin(current_user)
+
     venue = db.scalar(
         select(Venue).where(
             Venue.id == venue_id,
@@ -183,9 +205,9 @@ def delete_venue(
     )
 
     if not venue:
-        return RedirectResponse(
-            url="/venues",
-            status_code=status.HTTP_303_SEE_OTHER,
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Lokalen hittades inte",
         )
 
     db.delete(venue)
