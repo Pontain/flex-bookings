@@ -16,6 +16,11 @@
 </section>
 
 <section class="table-wrap">
+    {% if error %}
+    <div class="alert alert-error">
+        {{ error }}
+    </div>
+    {% endif %}
     <table class="stats-table">
         <thead>
             <tr>

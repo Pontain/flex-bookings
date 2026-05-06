@@ -53,3 +53,20 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const startDateInput = document.getElementById("start_date");
+    const endDateInput = document.getElementById("end_date");
+
+    if (!startDateInput || !endDateInput) {
+        return;
+    }
+
+    startDateInput.addEventListener("change", () => {
+        endDateInput.min = startDateInput.value;
+
+        if (!endDateInput.value || endDateInput.value < startDateInput.value) {
+            endDateInput.value = startDateInput.value;
+        }
+    });
+});

@@ -89,7 +89,8 @@ def create_booking_submit(
     contact_name: str = Form(...),
     contact_email: str = Form(...),
     contact_phone: str | None = Form(None),
-    booking_date: str = Form(...),
+    start_date: str = Form(...),
+    end_date: str = Form(...),
     start_hour: str = Form(...),
     start_minute: str = Form(...),
     end_hour: str = Form(...),
@@ -110,7 +111,8 @@ def create_booking_submit(
         "contact_name": contact_name,
         "contact_email": contact_email,
         "contact_phone": contact_phone or "",
-        "booking_date": booking_date,
+        "start_date": start_date,
+        "end_date": end_date,
         "start_hour": start_hour,
         "start_minute": start_minute,
         "end_hour": end_hour,
@@ -141,12 +143,13 @@ def create_booking_submit(
             raise ValueError("Slutminuten måste vara mellan 00 och 59.")
 
         start_time = datetime.strptime(
-            f"{booking_date} {start_hour}:{start_minute}",
-            "%Y-%m-%d %H:%M"
+            f"{start_date} {start_hour}:{start_minute}",
+            "%Y-%m-%d %H:%M",
         )
+
         end_time = datetime.strptime(
-            f"{booking_date} {end_hour}:{end_minute}",
-            "%Y-%m-%d %H:%M"
+            f"{end_date} {end_hour}:{end_minute}",
+            "%Y-%m-%d %H:%M",
         )
 
         if end_time <= start_time:
@@ -236,7 +239,6 @@ def create_booking_submit(
         url=f"/bookings/{booking.id}",
         status_code=status.HTTP_303_SEE_OTHER,
     )
-
 @router.get("/bookings/{booking_id}", response_class=HTMLResponse)
 def booking_detail(
     booking_id: int,

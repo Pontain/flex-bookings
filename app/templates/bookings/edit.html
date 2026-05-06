@@ -5,23 +5,20 @@
 {% block content %}
 <section class="page-header">
     <h1>Redigera bokning</h1>
-    <p class="page-subtitle">Uppdatera informationen för bokningen</p>
+    <p class="page-subtitle">Uppdatera bokningens information</p>
 </section>
 
 <div class="glass page-card">
+    {% if error %}
+        <div class="alert alert-error">
+            {{ error }}
+        </div>
+    {% endif %}
+
     <form method="post" class="form-dark">
-
-        <label for="title">Titel</label>
-        <input
-            type="text"
-            id="title"
-            name="title"
-            value="{{ booking.title }}"
-            required
-        >
-
         <label for="venue_id">Lokal</label>
         <select id="venue_id" name="venue_id" required>
+            <option value="">Välj lokal</option>
             {% for venue in venues %}
                 <option value="{{ venue.id }}"
                     {% if venue.id == booking.venue_id %}selected{% endif %}
@@ -31,50 +28,112 @@
             {% endfor %}
         </select>
 
+        <label for="title">Titel</label>
+        <input type="text" id="title" name="title" value="{{ booking.title }}" required>
+
         <label for="description">Beskrivning</label>
         <textarea id="description" name="description" rows="4">{{ booking.description or "" }}</textarea>
 
         <label for="contact_name">Kontaktperson</label>
-        <input
-            type="text"
-            id="contact_name"
-            name="contact_name"
-            value="{{ booking.contact_name or '' }}"
-        >
+        <input type="text" id="contact_name" name="contact_name" value="{{ booking.contact_name or '' }}" required>
 
         <label for="contact_email">E-post</label>
-        <input
-            type="email"
-            id="contact_email"
-            name="contact_email"
-            value="{{ booking.contact_email or '' }}"
-        >
+        <input type="email" id="contact_email" name="contact_email" value="{{ booking.contact_email or '' }}" required>
 
         <label for="contact_phone">Telefon</label>
-        <input
-            type="text"
-            id="contact_phone"
-            name="contact_phone"
-            value="{{ booking.contact_phone or '' }}"
-        >
+        <input type="text" id="contact_phone" name="contact_phone" value="{{ booking.contact_phone or '' }}">
 
-        <label for="start_time">Starttid</label>
-        <input
-            type="datetime-local"
-            id="start_time"
-            name="start_time"
-            value="{{ booking.start_time.strftime('%Y-%m-%dT%H:%M') }}"
-            required
-        >
+        <div class="booking-datetime-grid">
+            <div class="datetime-column">
+                <label for="start_date">Startdatum</label>
+                <input
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="{{ booking.start_time.strftime('%Y-%m-%d') }}"
+                    required
+                >
 
-        <label for="end_time">Sluttid</label>
-        <input
-            type="datetime-local"
-            id="end_time"
-            name="end_time"
-            value="{{ booking.end_time.strftime('%Y-%m-%dT%H:%M') }}"
-            required
-        >
+                <label for="end_date">Slutdatum</label>
+                <input
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    value="{{ booking.end_time.strftime('%Y-%m-%d') }}"
+                    required
+                >
+            </div>
+
+            <datalist id="hour-options">
+                {% for h in range(0, 24) %}
+                    {% set value = "%02d"|format(h) %}
+                    <option value="{{ value }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <datalist id="minute-options">
+                {% for m in range(0, 60, 5) %}
+                    {% set value = "%02d"|format(m) %}
+                    <option value="{{ value }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <div class="datetime-column">
+                <label>Starttid</label>
+                <div class="time-inputs">
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="start_hour"
+                        list="hour-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="HH"
+                        value="{{ booking.start_time.strftime('%H') }}"
+                        required
+                    >
+                    <span>:</span>
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="start_minute"
+                        list="minute-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="MM"
+                        value="{{ booking.start_time.strftime('%M') }}"
+                        required
+                    >
+                </div>
+
+                <label>Sluttid</label>
+                <div class="time-inputs">
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="end_hour"
+                        list="hour-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="HH"
+                        value="{{ booking.end_time.strftime('%H') }}"
+                        required
+                    >
+                    <span>:</span>
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="end_minute"
+                        list="minute-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="MM"
+                        value="{{ booking.end_time.strftime('%M') }}"
+                        required
+                    >
+                </div>
+            </div>
+        </div>
 
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">Spara ändringar</button>

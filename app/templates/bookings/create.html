@@ -5,140 +5,167 @@
 {% block content %}
 <section class="page-header">
     <h1>Ny bokning</h1>
-    <p class="page-subtitle">Skapa en ny bokning för vald lokal</p>
+    <p class="page-subtitle">Skapa en ny bokning</p>
 </section>
 
-{% if error %}
-<div class="alert alert-danger">
-    {{ error }}
-</div>
-{% endif %}
+<div class="glass page-card">
+    {% if error %}
+        <div class="alert alert-error">
+            {{ error }}
+        </div>
+    {% endif %}
 
-<form method="post" action="/bookings/new" id="booking-form" class="form-light booking-form glass">
-    <span>
+    <form method="post" class="form-dark">
         <label for="venue_id">Lokal</label>
         <select id="venue_id" name="venue_id" required>
             <option value="">Välj lokal</option>
             {% for venue in venues %}
-            <option value="{{ venue.id }}"
-                {% if form_data.get('venue_id')|string == venue.id|string %}selected{% endif %}>
-                {{ venue.name }}
-            </option>
+                <option value="{{ venue.id }}"
+                    {% if form_data and form_data.get("venue_id")|string == venue.id|string %}selected{% endif %}
+                >
+                    {{ venue.name }}
+                </option>
             {% endfor %}
         </select>
-    </span>
 
-    <span>
         <label for="title">Titel</label>
-        <input id="title" type="text" name="title" value="{{ form_data.get('title', '') }}" required>
-    </span>
+        <input
+            type="text"
+            id="title"
+            name="title"
+            value="{{ form_data.get('title', '') if form_data else '' }}"
+            required
+        >
 
-    <span>
         <label for="description">Beskrivning</label>
-        <textarea id="description" name="description" rows="4">{{ form_data.get('description', '') }}</textarea>
-    </span>
+        <textarea id="description" name="description" rows="4">{{ form_data.get('description', '') if form_data else '' }}</textarea>
 
-    <span>
         <label for="contact_name">Kontaktperson</label>
-        <input id="contact_name" type="text" name="contact_name" value="{{ form_data.get('contact_name', '') }}" required>
-    </span>
+        <input
+            type="text"
+            id="contact_name"
+            name="contact_name"
+            value="{{ form_data.get('contact_name', '') if form_data else '' }}"
+            required
+        >
 
-    <span>
         <label for="contact_email">E-post</label>
-        <input id="contact_email" type="email" name="contact_email" value="{{ form_data.get('contact_email', '') }}" required>
-    </span>
+        <input
+            type="email"
+            id="contact_email"
+            name="contact_email"
+            value="{{ form_data.get('contact_email', '') if form_data else '' }}"
+            required
+        >
 
-    <span>
         <label for="contact_phone">Telefon</label>
-        <input id="contact_phone" type="text" name="contact_phone" value="{{ form_data.get('contact_phone', '') }}">
-    </span>
+        <input
+            type="text"
+            id="contact_phone"
+            name="contact_phone"
+            value="{{ form_data.get('contact_phone', '') if form_data else '' }}"
+        >
 
-    <div class="booking-form-grid">
-        <span>
-            <label for="booking_date">Datum</label>
-            <input
-                id="booking_date"
-                type="date"
-                name="booking_date"
-                value="{{ form_data.get('booking_date', '') }}"
-                required
-            >
-        </span>
-
-        <span>
-            <label>Starttid</label>
-            <div class="time-row">
+        <div class="booking-datetime-grid">
+            <div class="datetime-column">
+                <label for="start_date">Startdatum</label>
                 <input
-                    id="start_hour"
-                    type="text"
-                    name="start_hour"
-                    list="hours-list"
-                    inputmode="numeric"
-                    placeholder="HH"
-                    maxlength="2"
-                    value="{{ form_data.get('start_hour', '') }}"
+                    type="date"
+                    id="start_date"
+                    name="start_date"
+                    value="{{ form_data.get('start_date', '') if form_data else '' }}"
                     required
                 >
-                <span class="time-separator">:</span>
+
+                <label for="end_date">Slutdatum</label>
                 <input
-                    id="start_minute"
-                    type="text"
-                    name="start_minute"
-                    list="minutes-list"
-                    inputmode="numeric"
-                    placeholder="MM"
-                    maxlength="2"
-                    value="{{ form_data.get('start_minute', '') }}"
+                    type="date"
+                    id="end_date"
+                    name="end_date"
+                    value="{{ form_data.get('end_date', '') if form_data else '' }}"
                     required
                 >
             </div>
-        </span>
 
-        <span>
-            <label>Sluttid</label>
-            <div class="time-row">
-                <input
-                    id="end_hour"
-                    type="text"
-                    name="end_hour"
-                    list="hours-list"
-                    inputmode="numeric"
-                    placeholder="HH"
-                    maxlength="2"
-                    value="{{ form_data.get('end_hour', '') }}"
-                    required
-                >
-                <span class="time-separator">:</span>
-                <input
-                    id="end_minute"
-                    type="text"
-                    name="end_minute"
-                    list="minutes-list"
-                    inputmode="numeric"
-                    placeholder="MM"
-                    maxlength="2"
-                    value="{{ form_data.get('end_minute', '') }}"
-                    required
-                >
+            <datalist id="hour-options">
+    {% for h in range(0, 24) %}
+        {% set value = "%02d"|format(h) %}
+        <option value="{{ value }}"></option>
+    {% endfor %}
+</datalist>
+
+            <datalist id="minute-options">
+                {% for m in range(0, 60, 5) %}
+                    {% set value = "%02d"|format(m) %}
+                    <option value="{{ value }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <div class="datetime-column">
+                <label>Starttid</label>
+                <div class="time-inputs">
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="start_hour"
+                        list="hour-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="HH"
+                        value="{{ form_data.get('start_hour', '') if form_data else '' }}"
+                        required
+                    >
+
+                    <span>:</span>
+
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="start_minute"
+                        list="minute-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="MM"
+                        value="{{ form_data.get('start_minute', '') if form_data else '' }}"
+                        required
+                    >
+                </div>
+
+                <label>Sluttid</label>
+                <div class="time-inputs">
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="end_hour"
+                        list="hour-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="HH"
+                        value="{{ form_data.get('end_hour', '') if form_data else '' }}"
+                        required
+                    >
+
+                    <span>:</span>
+
+                    <input
+                        class="time-field"
+                        type="text"
+                        name="end_minute"
+                        list="minute-options"
+                        inputmode="numeric"
+                        maxlength="2"
+                        placeholder="MM"
+                        value="{{ form_data.get('end_minute', '') if form_data else '' }}"
+                        required
+                    >
+                </div>
             </div>
-        </span>
-    </div>
+        </div>
 
-    <datalist id="hours-list">
-        {% for h in range(24) %}
-        <option value="{{ '%02d' % h }}"></option>
-        {% endfor %}
-    </datalist>
-
-    <datalist id="minutes-list">
-        {% for m in range(60) %}
-        <option value="{{ '%02d' % m }}"></option>
-        {% endfor %}
-    </datalist>
-
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Spara bokning</button>
-        <a href="/bookings" class="btn btn-secondary">Avbryt</a>
-    </div>
-</form>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Spara bokning</button>
+            <a href="/bookings" class="btn btn-secondary">Avbryt</a>
+        </div>
+    </form>
+</div>
 {% endblock %}
