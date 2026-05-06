@@ -77,7 +77,9 @@
                         </div>
 
                         <div class="month-day-bookings">
-                            {% for booking in day.bookings %}
+                            {% for item in day.bookings %}
+                                {% set booking = item.booking %}
+
                                 <button
                                     type="button"
                                     class="month-booking-chip"
@@ -85,7 +87,7 @@
                                     data-venue-color="{{ booking.venue.color or '#5f73ff' }}"
                                 >
                                     <span class="month-booking-time">
-                                        {{ booking.start_time.strftime('%H:%M') }}
+                                        {{ item.time_label }}
                                     </span>
                                     <span class="month-booking-title">
                                         {{ booking.title }}

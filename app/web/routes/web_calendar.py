@@ -15,6 +15,32 @@ from app.models.user import User
 router = APIRouter(tags=["Web Calendar"])
 
 
+def format_booking_time_for_day(booking: Booking, current_day: date) -> str:
+    day_start = datetime.combine(
+        current_day,
+        datetime.min.time(),
+        tzinfo=booking.start_time.tzinfo,
+    )
+    day_end = day_start + timedelta(days=1)
+
+    starts_today = day_start <= booking.start_time < day_end
+    ends_today = day_start < booking.end_time <= day_end
+
+    start_text = booking.start_time.strftime("%H:%M")
+    end_text = booking.end_time.strftime("%H:%M")
+
+    if starts_today and ends_today:
+        return f"{start_text} - {end_text}"
+
+    if starts_today:
+        return f"{start_text} - fortsätter"
+
+    if ends_today:
+        return f"fortsätter - {end_text}"
+
+    return "fortsätter"
+
+
 @router.get("/calendar/week", response_class=HTMLResponse)
 def calendar_week_view(request: Request):
     return templates.TemplateResponse(
@@ -36,16 +62,13 @@ def calendar_month(
     current_year = year or today.year
     current_month = month or today.month
 
-    # Första och sista dagen i vald månad
     month_start = date(current_year, current_month, 1)
     _, days_in_month = py_calendar.monthrange(current_year, current_month)
     month_end = date(current_year, current_month, days_in_month)
 
-    # Kalendern ska börja på måndag och sluta på söndag
     grid_start = month_start - timedelta(days=month_start.weekday())
     grid_end = month_end + timedelta(days=(6 - month_end.weekday()))
 
-    # Datetime-intervall för SQL-frågan
     grid_start_dt = datetime.combine(grid_start, datetime.min.time())
     grid_end_dt = datetime.combine(grid_end + timedelta(days=1), datetime.min.time())
 
@@ -54,15 +77,29 @@ def calendar_month(
         .options(selectinload(Booking.venue))
         .where(Booking.organization_id == current_user.organization_id)
         .where(Booking.start_time < grid_end_dt)
-        .where(Booking.end_time >= grid_start_dt)
+        .where(Booking.end_time > grid_start_dt)
         .order_by(Booking.start_time.asc())
     ).scalars().all()
 
-    bookings_by_day: dict[date, list[Booking]] = {}
+    bookings_by_day: dict[date, list[dict]] = {}
 
     for booking in bookings:
-        booking_day = booking.start_time.date()
-        bookings_by_day.setdefault(booking_day, []).append(booking)
+        first_day = max(booking.start_time.date(), grid_start)
+        last_day = min(booking.end_time.date(), grid_end)
+
+        if booking.end_time.time() == datetime.min.time():
+            last_day -= timedelta(days=1)
+
+        current_booking_day = first_day
+
+        while current_booking_day <= last_day:
+            bookings_by_day.setdefault(current_booking_day, []).append(
+                {
+                    "booking": booking,
+                    "time_label": format_booking_time_for_day(booking, current_booking_day),
+                }
+            )
+            current_booking_day += timedelta(days=1)
 
     weeks = []
     current_day = grid_start

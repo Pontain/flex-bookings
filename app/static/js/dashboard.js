@@ -14,6 +14,35 @@ function formatTime(dateString) {
     });
 }
 
+function formatEventTimeForDay(event, dayDate) {
+    const eventStart = new Date(event.start);
+    const eventEnd = new Date(event.end);
+
+    const dayStart = new Date(dayDate);
+    dayStart.setHours(0, 0, 0, 0);
+
+    const dayEnd = new Date(dayDate);
+    dayEnd.setDate(dayEnd.getDate() + 1);
+    dayEnd.setHours(0, 0, 0, 0);
+
+    const startsToday = eventStart >= dayStart && eventStart < dayEnd;
+    const endsToday = eventEnd > dayStart && eventEnd <= dayEnd;
+
+    if (startsToday && endsToday) {
+        return `${formatTime(event.start)} - ${formatTime(event.end)}`;
+    }
+
+    if (startsToday) {
+        return `${formatTime(event.start)} - fortsätter`;
+    }
+
+    if (endsToday) {
+        return `fortsätter - ${formatTime(event.end)}`;
+    }
+
+    return "fortsätter";
+}
+
 /* =========================
    Modal-funktionalitet
 ========================= */
@@ -99,10 +128,19 @@ function renderDashboardCalendar(startString, events) {
         const body = document.createElement("div");
         body.className = "dashboard-day-body";
 
+        const dayStart = new Date(dayDate);
+        dayStart.setHours(0, 0, 0, 0);
+
+        const dayEnd = new Date(dayDate);
+        dayEnd.setDate(dayEnd.getDate() + 1);
+        dayEnd.setHours(0, 0, 0, 0);
+
         const dayEvents = events
             .filter(event => {
                 const eventStart = new Date(event.start);
-                return eventStart.toDateString() === dayDate.toDateString();
+                const eventEnd = new Date(event.end);
+
+                return eventStart < dayEnd && eventEnd > dayStart;
             })
             .sort((a, b) => new Date(a.start) - new Date(b.start));
 
@@ -124,7 +162,7 @@ function renderDashboardCalendar(startString, events) {
 
                 card.innerHTML = `
                     <div class="booking-title">${event.title}</div>
-                    <div class="booking-time">${formatTime(event.start)} - ${formatTime(event.end)}</div>
+                    <div class="booking-time">${formatEventTimeForDay(event, dayDate)}</div>
                     <div class="booking-contact">${event.contact_name ?? ""}</div>
                 `;
 
