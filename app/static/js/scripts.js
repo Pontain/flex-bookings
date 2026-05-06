@@ -21,3 +21,35 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("booking-form");
+    if (!form) return;
+
+    const dateInput = document.getElementById("booking_date");
+    const startHourInput = document.getElementById("start_hour");
+    const startMinuteInput = document.getElementById("start_minute");
+
+    if (!dateInput || !startHourInput || !startMinuteInput) return;
+
+    form.addEventListener("submit", (event) => {
+        const dateValue = dateInput.value;
+        const hourValue = startHourInput.value.padStart(2, "0");
+        const minuteValue = startMinuteInput.value.padStart(2, "0");
+
+        if (!dateValue || !hourValue || !minuteValue) return;
+
+        const startDate = new Date(`${dateValue}T${hourValue}:${minuteValue}`);
+        const now = new Date();
+
+        if (startDate < now) {
+            const confirmed = confirm(
+                "Starttiden ligger bakåt i tiden.\n\nVill du ändå skapa bokningen?"
+            );
+
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        }
+    });
+});

@@ -298,3 +298,152 @@ def booking_details_modal(
             "current_user": current_user,
         },
     )
+
+@router.get("/bookings/{booking_id}/edit", response_class=HTMLResponse)
+def edit_booking_view(
+    booking_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = (
+        db.query(Booking)
+        .filter(
+            Booking.id == booking_id,
+            Booking.organization_id == current_user.organization_id,
+        )
+        .first()
+    )
+
+    if not booking:
+        return templates.TemplateResponse(
+            "404.html",
+            {
+                "request": request,
+                "message": "Bokningen kunde inte hittas.",
+            },
+            status_code=404,
+        )
+
+    venues = (
+        db.query(Venue)
+        .filter(
+            Venue.organization_id == current_user.organization_id,
+            Venue.is_active == True,
+        )
+        .order_by(Venue.name)
+        .all()
+    )
+
+    return templates.TemplateResponse(
+        "bookings/edit.html",
+        {
+            "request": request,
+            "booking": booking,
+            "venues": venues,
+            "current_user": current_user,
+        },
+    )
+
+
+@router.post("/bookings/{booking_id}/edit")
+def edit_booking(
+    booking_id: int,
+    title: str = Form(...),
+    description: str = Form(""),
+    venue_id: int = Form(...),
+    contact_name: str = Form(""),
+    contact_email: str = Form(""),
+    contact_phone: str = Form(""),
+    start_time: datetime = Form(...),
+    end_time: datetime = Form(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = (
+        db.query(Booking)
+        .filter(
+            Booking.id == booking_id,
+            Booking.organization_id == current_user.organization_id,
+        )
+        .first()
+    )
+
+    if not booking:
+        raise HTTPException(status_code=404, detail="Bokningen finns inte")
+
+    venue = (
+        db.query(Venue)
+        .filter(
+            Venue.id == venue_id,
+            Venue.organization_id == current_user.organization_id,
+        )
+        .first()
+    )
+
+    if not venue:
+        raise HTTPException(status_code=404, detail="Lokalen finns inte")
+
+    if end_time <= start_time:
+        raise HTTPException(
+            status_code=400,
+            detail="Sluttiden måste vara efter starttiden",
+        )
+
+    conflict = (
+        db.query(Booking)
+        .filter(
+            Booking.id != booking_id,
+            Booking.venue_id == venue_id,
+            Booking.organization_id == current_user.organization_id,
+            Booking.status != "cancelled",
+            Booking.start_time < end_time,
+            Booking.end_time > start_time,
+        )
+        .first()
+    )
+
+    if conflict:
+        raise HTTPException(
+            status_code=400,
+            detail="Det finns redan en bokning på vald tid",
+        )
+
+    booking.title = title
+    booking.description = description
+    booking.venue_id = venue_id
+    booking.contact_name = contact_name
+    booking.contact_email = contact_email
+    booking.contact_phone = contact_phone
+    booking.start_time = start_time
+    booking.end_time = end_time
+
+    db.commit()
+
+    return RedirectResponse(
+        url=f"/bookings/{booking.id}",
+        status_code=303,
+    )
+
+@router.post("/bookings/{booking_id}/delete")
+def delete_booking(
+    booking_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    booking = (
+        db.query(Booking)
+        .filter(
+            Booking.id == booking_id,
+            Booking.organization_id == current_user.organization_id,
+        )
+        .first()
+    )
+
+    if not booking:
+        raise HTTPException(status_code=404, detail="Bokningen finns inte")
+
+    db.delete(booking)
+    db.commit()
+
+    return RedirectResponse(url="/bookings", status_code=303)

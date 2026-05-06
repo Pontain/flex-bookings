@@ -22,7 +22,7 @@
         </form>
     {% endif %}
 
-    {% if user_id == current_user_id %}
+    {% if current_user_id is not none and user_id == current_user_id %}
         <span class="text-muted">(du)</span>
     {% endif %}
 </div>

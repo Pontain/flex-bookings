@@ -1,11 +1,20 @@
 {% extends "base.html" %}
+{% from "macros/actions.html" import row_actions %}
 
 {% block title %}Bokningar{% endblock %}
 
 {% block content %}
 <section class="page-header">
-    <h1>Bokningar</h1>
-    <p class="page-subtitle">Sök och visa aktuella bokningar</p>
+        <section class="page-header page-header-actions">
+        <div>
+            <h1>Bokningar</h1>
+            <p class="page-subtitle">Sök och visa aktuella bokningar</p>
+        </div>
+            <br>
+        <a href="/bookings/new" class="btn btn-primary">
+            + Ny bokning
+        </a>
+    </section>
 </section>
 
 <form method="get" action="/bookings" class="search-form booking-search-form">
@@ -25,8 +34,10 @@
                 <th>Start</th>
                 <th>Slut</th>
                 <th>Kontakt</th>
+                <th>Åtgärder</th>
             </tr>
         </thead>
+
         <tbody>
             {% for booking in bookings %}
             <tr class="clickable-row" data-href="/bookings/{{ booking.id }}">
@@ -36,6 +47,16 @@
                 <td>{{ booking.start_time | datetime }}</td>
                 <td>{{ booking.end_time | datetime }}</td>
                 <td>{{ booking.contact_name }}</td>
+
+                <td>
+                    {{ row_actions(
+                        user_id=0,
+                        current_user_id=None,
+                        edit_href="/bookings/" ~ booking.id ~ "/edit",
+                        delete_action="/bookings/" ~ booking.id ~ "/delete",
+                        delete_message="Är du säker på att du vill ta bort bokningen?"
+                    ) }}
+                </td>
             </tr>
             {% endfor %}
         </tbody>

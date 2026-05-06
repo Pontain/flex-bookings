@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Redigera bokning{% endblock %}
+
+{% block content %}
+<section class="page-header">
+    <h1>Redigera bokning</h1>
+    <p class="page-subtitle">Uppdatera informationen för bokningen</p>
+</section>
+
+<div class="glass page-card">
+    <form method="post" class="form-dark">
+
+        <label for="title">Titel</label>
+        <input
+            type="text"
+            id="title"
+            name="title"
+            value="{{ booking.title }}"
+            required
+        >
+
+        <label for="venue_id">Lokal</label>
+        <select id="venue_id" name="venue_id" required>
+            {% for venue in venues %}
+                <option value="{{ venue.id }}"
+                    {% if venue.id == booking.venue_id %}selected{% endif %}
+                >
+                    {{ venue.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="description">Beskrivning</label>
+        <textarea id="description" name="description" rows="4">{{ booking.description or "" }}</textarea>
+
+        <label for="contact_name">Kontaktperson</label>
+        <input
+            type="text"
+            id="contact_name"
+            name="contact_name"
+            value="{{ booking.contact_name or '' }}"
+        >
+
+        <label for="contact_email">E-post</label>
+        <input
+            type="email"
+            id="contact_email"
+            name="contact_email"
+            value="{{ booking.contact_email or '' }}"
+        >
+
+        <label for="contact_phone">Telefon</label>
+        <input
+            type="text"
+            id="contact_phone"
+            name="contact_phone"
+            value="{{ booking.contact_phone or '' }}"
+        >
+
+        <label for="start_time">Starttid</label>
+        <input
+            type="datetime-local"
+            id="start_time"
+            name="start_time"
+            value="{{ booking.start_time.strftime('%Y-%m-%dT%H:%M') }}"
+            required
+        >
+
+        <label for="end_time">Sluttid</label>
+        <input
+            type="datetime-local"
+            id="end_time"
+            name="end_time"
+            value="{{ booking.end_time.strftime('%Y-%m-%dT%H:%M') }}"
+            required
+        >
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Spara ändringar</button>
+            <a href="/bookings/{{ booking.id }}" class="btn btn-secondary">Avbryt</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
