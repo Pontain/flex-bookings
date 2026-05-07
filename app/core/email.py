@@ -10,7 +10,7 @@ async def send_password_reset_email(to_email: str, reset_link: str):
     smtp_username = os.getenv("SMTP_USERNAME")
     smtp_password = os.getenv("SMTP_PASSWORD")
     from_email = os.getenv("SMTP_FROM_EMAIL")
-    from_name = os.getenv("SMTP_FROM_NAME", "FlexBooking")
+    from_name = os.getenv("SMTP_FROM_NAME", "Modium")
 
     print("SMTP_HOST:", smtp_host)
     print("SMTP_PORT:", smtp_port)

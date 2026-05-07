@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}FlexBooking | Månadskalender{% endblock %}
+{% block title %}Modium | Månadskalender{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="/static/css/calendar.css">
@@ -40,13 +40,9 @@
                 >
                     {{ month_name }} {{ year }}
                 </h2>
-                <button
-                    id="today-month"
-                    class="btn calendar-today-btn"
-                    type="button"
-                >
+                <a href="/calendar/month" class="btn btn-secondary calendar-today-btn">
                     Idag
-                </button>
+                </a>
             </div>
 
             <button
