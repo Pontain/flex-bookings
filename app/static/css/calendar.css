@@ -22,7 +22,13 @@
     padding: 0 1rem;
 }
 
-.calendar-nav-center,
+.calendar-nav-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 .calendar-header-center,
 .calendar-month-title-wrap {
     text-align: center;

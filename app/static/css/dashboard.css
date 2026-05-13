@@ -216,3 +216,15 @@
         width: 100%;
     }
 }
+
+.dashboard-day.today {
+    border: 1px solid rgba(96, 165, 250, 0.9);
+    box-shadow:
+        0 0 0 1px rgba(96, 165, 250, 0.25),
+        0 0 22px rgba(96, 165, 250, 0.25);
+    background: rgba(78, 105, 180, 0.34);
+}
+
+.dashboard-day.today .dashboard-day-header {
+    background: rgba(59, 130, 246, 0.28);
+}

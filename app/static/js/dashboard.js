@@ -121,6 +121,16 @@ function renderDashboardCalendar(startString, events) {
         const column = document.createElement("div");
         column.className = "dashboard-day";
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const currentDay = new Date(dayDate);
+        currentDay.setHours(0, 0, 0, 0);
+
+        if (currentDay.getTime() === today.getTime()) {
+            column.classList.add("today");
+        }
+        
         const header = document.createElement("div");
         header.className = "dashboard-day-header";
         header.textContent = formatDayLabel(dayDate);

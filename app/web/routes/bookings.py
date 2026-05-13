@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date, time
 
 from fastapi import APIRouter, HTTPException, Request, Depends, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -357,8 +357,14 @@ def edit_booking(
     contact_name: str = Form(""),
     contact_email: str = Form(""),
     contact_phone: str = Form(""),
-    start_time: datetime = Form(...),
-    end_time: datetime = Form(...),
+
+    start_date: date = Form(...),
+    start_hour: str = Form(...),
+    start_minute: str = Form(...),
+    end_date: date = Form(...),
+    end_hour: str = Form(...),
+    end_minute: str = Form(...),
+
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -385,6 +391,16 @@ def edit_booking(
 
     if not venue:
         raise HTTPException(status_code=404, detail="Lokalen finns inte")
+
+    start_time = datetime.combine(
+        start_date,
+        time(int(start_hour), int(start_minute)),
+    )
+
+    end_time = datetime.combine(
+        end_date,
+        time(int(end_hour), int(end_minute)),
+    )
 
     if end_time <= start_time:
         raise HTTPException(
@@ -426,26 +442,3 @@ def edit_booking(
         url=f"/bookings/{booking.id}",
         status_code=303,
     )
-
-@router.post("/bookings/{booking_id}/delete")
-def delete_booking(
-    booking_id: int,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    booking = (
-        db.query(Booking)
-        .filter(
-            Booking.id == booking_id,
-            Booking.organization_id == current_user.organization_id,
-        )
-        .first()
-    )
-
-    if not booking:
-        raise HTTPException(status_code=404, detail="Bokningen finns inte")
-
-    db.delete(booking)
-    db.commit()
-
-    return RedirectResponse(url="/bookings", status_code=303)
