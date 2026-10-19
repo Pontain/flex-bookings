@@ -64,6 +64,7 @@ def create_booking_form(
     venues = db.scalars(
         select(Venue)
         .where(Venue.organization_id == current_user.organization_id)
+        .where(Venue.is_active == True)
         .order_by(Venue.name.asc())
     ).all()
 
@@ -101,6 +102,7 @@ def create_booking_submit(
     venues = db.scalars(
         select(Venue)
         .where(Venue.organization_id == current_user.organization_id)
+        .where(Venue.is_active == True)
         .order_by(Venue.name.asc())
     ).all()
 
@@ -392,21 +394,15 @@ def edit_booking(
     if not venue:
         raise HTTPException(status_code=404, detail="Lokalen finns inte")
 
-    start_time = datetime.combine(
-        start_date,
-        time(int(start_hour), int(start_minute)),
-    )
-
-    end_time = datetime.combine(
-        end_date,
-        time(int(end_hour), int(end_minute)),
-    )
-
-    if end_time <= start_time:
-        raise HTTPException(
-            status_code=400,
-            detail="Sluttiden måste vara efter starttiden",
-        )
+    try:
+        data = BookingCreate(venue_id=venue_id, title=title, description=description,
+            contact_name=contact_name, contact_email=contact_email, contact_phone=contact_phone,
+            start_time=datetime.combine(start_date, time(int(start_hour), int(start_minute))),
+            end_time=datetime.combine(end_date, time(int(end_hour), int(end_minute))))
+    except (ValueError, ValidationError):
+        raise HTTPException(400, "Kontrollera bokningens uppgifter och tider.")
+    start_time, end_time = data.start_time, data.end_time
+    if not venue.is_active: raise HTTPException(400, "Lokalen är inaktiv.")
 
     conflict = (
         db.query(Booking)

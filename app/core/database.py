@@ -23,7 +23,17 @@ class Base(DeclarativeBase):
     )
 
 
-engine = create_engine(DATABASE_URL)
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+if engine.dialect.name == "sqlite":
+    from sqlalchemy import event
+    @event.listens_for(engine, "connect")
+    def configure_sqlite(connection, record):
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.execute("PRAGMA busy_timeout=10000")
 
 SessionLocal = sessionmaker(
     autocommit=False,

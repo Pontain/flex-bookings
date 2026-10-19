@@ -5,7 +5,8 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db
 from app.core.templates import templates
 from app.core.dependencies import get_current_user
-from app.core.security import hash_password
+from app.core.security import hash_password, normalize_email
+from app.web.routes.auth import issue_verification
 from app.models.user import User
 from app.models.organization_member import OrganizationMember
 
@@ -56,7 +57,7 @@ def new_user_form(
 
 
 @router.post("/users/new")
-def create_user(
+async def create_user(
     full_name: str = Form(""),
     email: str = Form(...),
     password: str = Form(...),
@@ -67,12 +68,14 @@ def create_user(
     if not current_user.is_superuser:
         raise HTTPException(status_code=403, detail="Behörighet saknas")
 
+    email = normalize_email(email)
+    if not 1 <= len(full_name.strip()) <= 120: raise HTTPException(400, "Namn måste innehålla 1–120 tecken")
     existing_user = db.query(User).filter(User.email == email).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="E-post finns redan")
 
     user = User(
-        full_name=full_name,
+        full_name=full_name.strip(),
         email=email,
         hashed_password=hash_password(password),
         is_superuser=True if is_superuser else False,
@@ -91,6 +94,8 @@ def create_user(
     db.add(membership)
 
     db.commit()
+    if not user.email_verified:
+        await issue_verification(db, user)
 
     return RedirectResponse(url="/users", status_code=status.HTTP_303_SEE_OTHER)
 
@@ -119,6 +124,8 @@ def delete_user(
     if not user:
         raise HTTPException(status_code=404, detail="Användaren finns inte")
 
+    owner = db.query(OrganizationMember).filter_by(user_id=user.id, role="owner").first()
+    if owner: raise HTTPException(400, "Organisationens ägare kan inte tas bort här.")
     db.delete(user)
     db.commit()
 
@@ -158,7 +165,7 @@ def edit_user_form(
 
 
 @router.post("/users/{user_id}/edit")
-def edit_user(
+async def edit_user(
     user_id: int,
     full_name: str = Form(""),
     email: str = Form(...),
@@ -182,12 +189,13 @@ def edit_user(
     if not user:
         raise HTTPException(status_code=404, detail="Användaren finns inte")
 
+    email = normalize_email(email)
+    if not 1 <= len(full_name.strip()) <= 120: raise HTTPException(400, "Namn måste innehålla 1–120 tecken")
     existing_user = (
         db.query(User)
         .filter(
             User.email == email,
             User.id != user_id,
-            User.organization_id == current_user.organization_id,
         )
         .first()
     )
@@ -195,16 +203,22 @@ def edit_user(
     if existing_user:
         raise HTTPException(status_code=400, detail="E-post finns redan")
 
+    email_changed = user.email != email
+    user.session_version += 1
+    user.reset_token = None
+    user.reset_token_expires_at = None
+    if email_changed: user.email_verified = False
     user.full_name = full_name.strip()
     user.email = email.strip()
 
     # Eget konto ska inte kunna råka förlora admin via formuläret
-    if user.id != current_user.id:
+    owner = db.query(OrganizationMember).filter_by(user_id=user.id, role="owner").first()
+    if user.id != current_user.id and not owner:
         user.is_superuser = True if is_superuser else False
 
     # Ändra bara lösenord om något faktiskt skrivits in
     if password and password.strip():
-        user.hashed_password = hash_password(password.strip())
+        user.hashed_password = hash_password(password)
 
     membership = (
         db.query(OrganizationMember)
@@ -216,8 +230,11 @@ def edit_user(
     )
 
     if membership:
-        membership.role = "admin" if user.is_superuser else "member"
+        if membership.role != "owner":
+            membership.role = "admin" if user.is_superuser else "member"
 
     db.commit()
+    if not user.email_verified:
+        await issue_verification(db, user)
 
     return RedirectResponse(url="/users", status_code=status.HTTP_303_SEE_OTHER)

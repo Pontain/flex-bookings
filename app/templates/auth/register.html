@@ -13,6 +13,7 @@
 
     <div class="content-card">
         <form method="post" action="/register" class="form-dark">
+<input type="hidden" name="csrf_token" value="{{ request.session.csrf }}">
             {% if error %}
                 <div class="form-error">{{ error }}</div>
             {% endif %}
@@ -53,7 +54,7 @@
             <div class="form-group">
                 <label for="password">Lösenord</label>
                 <input
-                    type="password"
+                    type="password" minlength="12" maxlength="128"
                     id="password"
                     name="password"
                     required

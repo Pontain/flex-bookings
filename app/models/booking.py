@@ -1,4 +1,5 @@
 from datetime import datetime
+from app.core.time import BookingTime
 from sqlalchemy import String, ForeignKey, DateTime, Text, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -33,8 +34,8 @@ class Booking(Base, TimestampMixin):
     contact_email: Mapped[str] = mapped_column(String(255))
     contact_phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
 
-    start_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
-    end_time: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    start_time: Mapped[datetime] = mapped_column(BookingTime(), index=True)
+    end_time: Mapped[datetime] = mapped_column(BookingTime(), index=True)
 
     status: Mapped[str] = mapped_column(String(30), default="confirmed")
 

@@ -23,7 +23,7 @@ def get_current_user(
         User.is_active == True
     ).first()
 
-    if not user:
+    if not user or not user.email_verified or request.session.get("version") != user.session_version:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Ogiltig session."

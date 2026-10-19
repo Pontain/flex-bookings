@@ -19,7 +19,7 @@ class InvalidBookingTimeError(Exception):
 
 
 def create_booking(db: Session, booking_data: BookingCreate, organization_id: int) -> Booking:
-    if booking_data.end_time <= booking_data.start_time:
+    if booking_data.end_time.timestamp() <= booking_data.start_time.timestamp():
         raise InvalidBookingTimeError(
             "Sluttiden måste vara senare än starttiden."
         )
@@ -27,7 +27,8 @@ def create_booking(db: Session, booking_data: BookingCreate, organization_id: in
     venue = db.scalar(
         select(Venue).where(
             Venue.id == booking_data.venue_id,
-            Venue.organization_id == organization_id
+            Venue.organization_id == organization_id,
+            Venue.is_active == True
         )
     )
 
@@ -37,11 +38,11 @@ def create_booking(db: Session, booking_data: BookingCreate, organization_id: in
     overlapping_booking = db.execute(
         select(Booking).where(
             Booking.venue_id == booking_data.venue_id,
-            Booking.status != "Avbruten",
+            Booking.status != "cancelled",
             booking_data.start_time < Booking.end_time,
             booking_data.end_time > Booking.start_time,
         )
-    ).scalar_one_or_none()
+    ).scalars().first()
 
     if overlapping_booking:
         raise BookingConflictError(
@@ -58,7 +59,7 @@ def create_booking(db: Session, booking_data: BookingCreate, organization_id: in
         contact_phone=booking_data.contact_phone,
         start_time=booking_data.start_time,
         end_time=booking_data.end_time,
-        status="Bokad",
+        status="confirmed",
     )
 
     db.add(booking)

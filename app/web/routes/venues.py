@@ -1,3 +1,4 @@
+from app.core.time import local_now, LOCAL
 from fastapi import APIRouter, HTTPException, Request, Depends, Form, status
 from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import select
@@ -46,6 +47,7 @@ def create_venue_form(
     request: Request,
     current_user: User = Depends(get_current_user),
 ):
+    require_admin(current_user)
     return templates.TemplateResponse(
         "venues/create.html",
         {
@@ -67,6 +69,11 @@ def create_venue_submit(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    require_admin(current_user)
+    from app.schemas.venue import VenueCreate
+    from pydantic import ValidationError
+    try: VenueCreate(name=name, description=description, capacity=capacity, color=color)
+    except ValidationError: raise HTTPException(400, "Kontrollera lokalnamn, kapacitet och färg.")
     form_data = {
         "name": name,
         "description": description or "",
@@ -177,6 +184,10 @@ def edit_venue_submit(
             status_code=status.HTTP_400_BAD_REQUEST,
         )
 
+    from app.schemas.venue import VenueCreate
+    from pydantic import ValidationError
+    try: VenueCreate(name=name, description=description, capacity=capacity, color=color)
+    except ValidationError: raise HTTPException(400, "Kontrollera lokalnamn, kapacitet och färg.")
     venue.name = name.strip()
     venue.description = description or None
     venue.capacity = capacity
@@ -200,6 +211,7 @@ def delete_venue(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
+    require_admin(current_user)
     venue = (
         db.query(Venue)
         .filter(
@@ -212,14 +224,14 @@ def delete_venue(
     if not venue:
         raise HTTPException(status_code=404, detail="Lokalen finns inte")
 
-    now = datetime.now()
+    now = local_now()
 
     future_booking_count = (
         db.query(Booking)
         .filter(
             Booking.venue_id == venue.id,
             Booking.organization_id == current_user.organization_id,
-            Booking.start_time >= now,
+            Booking.end_time > now,
             or_(
                 Booking.status.is_(None),
                 Booking.status != "cancelled",
@@ -242,7 +254,7 @@ def delete_venue(
                 "request": request,
                 "venues": venues,
                 "current_user": current_user,
-                "error": f"Lokalen kan inte tas bort eftersom den har {future_booking_count} framtida bokning(ar).",
+                "error": f"Lokalen kan inte tas bort eftersom den har {future_booking_count} pågående eller framtida bokning(ar).",
             },
             status_code=400,
         )

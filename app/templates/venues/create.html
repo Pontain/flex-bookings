@@ -12,6 +12,7 @@
 {% endif %}
 
 <form method="post" action="/venues/new" class="form-light glass">
+<input type="hidden" name="csrf_token" value="{{ request.session.csrf }}">
     <span>
         <label>Namn</label>
         <input type="text" name="name" value="{{ form_data.get('name','') }}" required>

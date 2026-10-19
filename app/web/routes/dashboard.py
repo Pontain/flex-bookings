@@ -1,3 +1,4 @@
+from app.core.time import local_now, LOCAL
 from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Request, Depends
@@ -21,7 +22,7 @@ def dashboard_view(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    now = datetime.now()
+    now = local_now()
 
     start_of_today = now.replace(hour=0, minute=0, second=0, microsecond=0)
     end_of_today = start_of_today + timedelta(days=1)
@@ -32,12 +33,14 @@ def dashboard_view(
 
     bookings_today = db.query(func.count(Booking.id)).filter(
         Booking.organization_id == current_user.organization_id,
+        Booking.status != "cancelled",
         Booking.start_time >= start_of_today,
         Booking.start_time < end_of_today,
     ).scalar() or 0
 
     bookings_this_week = db.query(func.count(Booking.id)).filter(
         Booking.organization_id == current_user.organization_id,
+        Booking.status != "cancelled",
         Booking.start_time >= start_of_week,
         Booking.start_time < end_of_week,
     ).scalar() or 0
@@ -49,6 +52,7 @@ def dashboard_view(
 
     next_booking = db.query(Booking).filter(
         Booking.organization_id == current_user.organization_id,
+        Booking.status != "cancelled",
         Booking.start_time >= now,
     ).order_by(Booking.start_time.asc()).first()
 

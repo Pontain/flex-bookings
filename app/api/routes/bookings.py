@@ -14,7 +14,7 @@ from app.services.booking_service import (
 )
 
 router = APIRouter(
-    prefix="/bookings",
+
     tags=["bookings"],
     dependencies=[Depends(get_current_user)]
 )
@@ -29,7 +29,7 @@ def create_booking_route(
     current_user: User = Depends(get_current_user)
 ):
     try:
-        booking = create_booking(db, booking_data)
+        booking = create_booking(db, booking_data, current_user.organization_id)
         return booking
     except VenueNotFoundError as e:
         raise HTTPException(
@@ -49,6 +49,6 @@ def get_bookings(
     current_user: User = Depends(get_current_user)
 ):
     bookings = db.execute(
-        select(Booking).order_by(Booking.start_time)
+        select(Booking).where(Booking.organization_id == current_user.organization_id).order_by(Booking.start_time)
     ).scalars().all()
     return bookings

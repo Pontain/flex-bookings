@@ -1,3 +1,4 @@
+from app.core.time import local_now, LOCAL
 from datetime import date, datetime, timedelta
 import calendar as py_calendar
 
@@ -42,22 +43,22 @@ def format_booking_time_for_day(booking: Booking, current_day: date) -> str:
 
 
 @router.get("/calendar/week", response_class=HTMLResponse)
-def calendar_week_view(request: Request):
+def calendar_week_view(request: Request, current_user: User = Depends(get_current_user)):
     return templates.TemplateResponse(
         "calendar/week.html",
-        {"request": request}
+        {"request": request, "current_user": current_user}
     )
 
 
 @router.get("/calendar/month", response_class=HTMLResponse)
 def calendar_month(
     request: Request,
-    year: int | None = Query(default=None),
-    month: int | None = Query(default=None),
+    year: int | None = Query(default=None, ge=1901, le=9998),
+    month: int | None = Query(default=None, ge=1, le=12),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    today = date.today()
+    today = local_now().date()
 
     current_year = year or today.year
     current_month = month or today.month
@@ -69,13 +70,14 @@ def calendar_month(
     grid_start = month_start - timedelta(days=month_start.weekday())
     grid_end = month_end + timedelta(days=(6 - month_end.weekday()))
 
-    grid_start_dt = datetime.combine(grid_start, datetime.min.time())
-    grid_end_dt = datetime.combine(grid_end + timedelta(days=1), datetime.min.time())
+    grid_start_dt = datetime.combine(grid_start, datetime.min.time(), tzinfo=LOCAL)
+    grid_end_dt = datetime.combine(grid_end + timedelta(days=1), datetime.min.time(), tzinfo=LOCAL)
 
     bookings = db.execute(
         select(Booking)
         .options(selectinload(Booking.venue))
         .where(Booking.organization_id == current_user.organization_id)
+        .where(Booking.status != "cancelled")
         .where(Booking.start_time < grid_end_dt)
         .where(Booking.end_time > grid_start_dt)
         .order_by(Booking.start_time.asc())
@@ -87,7 +89,7 @@ def calendar_month(
         first_day = max(booking.start_time.date(), grid_start)
         last_day = min(booking.end_time.date(), grid_end)
 
-        if booking.end_time.time() == datetime.min.time():
+        if booking.end_time.time() == datetime.min.time() and booking.end_time.date() <= grid_end:
             last_day -= timedelta(days=1)
 
         current_booking_day = first_day

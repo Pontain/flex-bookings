@@ -3,7 +3,7 @@ document.addEventListener("click", function (e) {
     const row = e.target.closest(".clickable-row");
     if (!row) return;
 
-    if (e.target.closest("a")) return;
+    if (e.target.closest("a, button, form, input")) return;
 
     const href = row.getAttribute("data-href");
     if (href) window.location.href = href;
@@ -69,4 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
             endDateInput.value = startDateInput.value;
         }
     });
+});
+document.addEventListener("submit", (event) => {
+    const message = event.target.dataset.confirm;
+    if (message && !window.confirm(message)) event.preventDefault();
 });

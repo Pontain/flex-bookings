@@ -1,4 +1,5 @@
-let currentDate = new Date();
+function escapeText(value) { const el = document.createElement("span"); el.textContent = value ?? ""; return el.innerHTML; }
+let currentDate = swedishClockDate();
 
 /* =========================
    Gemensam modal-funktionalitet
@@ -56,21 +57,22 @@ document.addEventListener("keydown", function (event) {
 
 function startOfWeek(date) {
     const d = new Date(date);
-    const day = d.getDay();
+    const day = d.getUTCDay();
     const diff = day === 0 ? -6 : 1 - day; // måndag som första dag
-    d.setDate(d.getDate() + diff);
-    d.setHours(0, 0, 0, 0);
+    d.setUTCDate(d.getUTCDate() + diff);
+    d.setUTCHours(0, 0, 0, 0);
     return d;
 }
 
 function endOfWeek(date) {
     const d = startOfWeek(date);
-    d.setDate(d.getDate() + 7);
+    d.setUTCDate(d.getUTCDate() + 7);
     return d;
 }
 
 function formatDateLabel(date) {
     return date.toLocaleDateString("sv-SE", {
+        timeZone: "UTC",
         weekday: "long",
         day: "numeric",
         month: "short"
@@ -79,13 +81,14 @@ function formatDateLabel(date) {
 
 function formatWeekLabel(startDate) {
     const endDate = new Date(startDate);
-    endDate.setDate(endDate.getDate() + 6);
+    endDate.setUTCDate(endDate.getUTCDate() + 6);
 
-    return `${startDate.toLocaleDateString("sv-SE")} - ${endDate.toLocaleDateString("sv-SE")}`;
+    return `${startDate.toLocaleDateString("sv-SE", {timeZone: "UTC"})} - ${endDate.toLocaleDateString("sv-SE", {timeZone: "UTC"})}`;
 }
 
 function formatTime(dateString) {
     return new Date(dateString).toLocaleTimeString("sv-SE", {
+        timeZone: "Europe/Stockholm",
         hour: "2-digit",
         minute: "2-digit"
     });
@@ -106,7 +109,7 @@ async function loadCalendar() {
 
     try {
         const response = await fetch(
-            `/calendar/events?start=${encodeURIComponent(weekStart.toISOString())}&end=${encodeURIComponent(weekEnd.toISOString())}`
+            `/calendar/events?start=${encodeURIComponent(calendarBoundary(weekStart))}&end=${encodeURIComponent(calendarBoundary(weekEnd))}`
         );
 
         if (!response.ok) {
@@ -123,15 +126,15 @@ async function loadCalendar() {
 }
 
 function formatEventTimeForDay(event, dayDate) {
-    const eventStart = new Date(event.start);
-    const eventEnd = new Date(event.end);
+    const eventStart = swedishClockDate(event.start);
+    const eventEnd = swedishClockDate(event.end);
 
     const dayStart = new Date(dayDate);
-    dayStart.setHours(0, 0, 0, 0);
+    dayStart.setUTCHours(0, 0, 0, 0);
 
     const dayEnd = new Date(dayDate);
-    dayEnd.setDate(dayEnd.getDate() + 1);
-    dayEnd.setHours(0, 0, 0, 0);
+    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+    dayEnd.setUTCHours(0, 0, 0, 0);
 
     const startsToday = eventStart >= dayStart && eventStart < dayEnd;
     const endsToday = eventEnd > dayStart && eventEnd <= dayEnd;
@@ -162,13 +165,13 @@ function renderCalendar(weekStart, events) {
 
     for (let i = 0; i < 7; i++) {
         const dayDate = new Date(weekStart);
-        dayDate.setDate(dayDate.getDate() + i);
+        dayDate.setUTCDate(dayDate.getUTCDate() + i);
 
         const dayColumn = document.createElement("div");
         dayColumn.className = "calendar-day";
 
-        const today = new Date();
-        if (dayDate.toDateString() === today.toDateString()) {
+        const today = swedishClockDate();
+        if (dayDate.toISOString().slice(0, 10) === today.toISOString().slice(0, 10)) {
             dayColumn.classList.add("today");
         }
 
@@ -193,16 +196,16 @@ function renderCalendar(weekStart, events) {
         scrollDown.textContent = "▼";
 
         const dayStart = new Date(dayDate);
-        dayStart.setHours(0, 0, 0, 0);
+        dayStart.setUTCHours(0, 0, 0, 0);
 
         const dayEnd = new Date(dayDate);
-        dayEnd.setDate(dayEnd.getDate() + 1);
-        dayEnd.setHours(0, 0, 0, 0);
+        dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+        dayEnd.setUTCHours(0, 0, 0, 0);
 
         const dayEvents = events
             .filter(event => {
-                const eventStart = new Date(event.start);
-                const eventEnd = new Date(event.end);
+                const eventStart = swedishClockDate(event.start);
+                const eventEnd = swedishClockDate(event.end);
 
                 return eventStart < dayEnd && eventEnd > dayStart;
             })
@@ -228,12 +231,12 @@ function renderCalendar(weekStart, events) {
                 }
 
                 card.innerHTML = `
-                    <div class="calendar-booking-title">${event.title}</div>
+                    <div class="calendar-booking-title">${escapeText(event.title)}</div>
                     <div class="calendar-booking-time">
                         ${formatEventTimeForDay(event, dayDate)}
                     </div>
                     <div class="calendar-booking-meta">
-                        ${event.contact_name ?? ""}
+                        ${escapeText(event.contact_name)}
                     </div>
                 `;
 
@@ -328,14 +331,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (prevWeekBtn) {
         prevWeekBtn.addEventListener("click", () => {
-            currentDate.setDate(currentDate.getDate() - 7);
+            currentDate.setUTCDate(currentDate.getUTCDate() - 7);
             loadCalendar();
         });
     }
 
     if (nextWeekBtn) {
         nextWeekBtn.addEventListener("click", () => {
-            currentDate.setDate(currentDate.getDate() + 7);
+            currentDate.setUTCDate(currentDate.getUTCDate() + 7);
             loadCalendar();
         });
     }

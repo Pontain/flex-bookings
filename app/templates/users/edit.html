@@ -13,6 +13,7 @@
 
     <div class="content-card">
         <form method="post" action="/users/{{ user.id }}/edit" class="form-dark">
+<input type="hidden" name="csrf_token" value="{{ request.session.csrf }}">
             <div class="form-group">
                 <label for="full_name">Namn</label>
                 <input 

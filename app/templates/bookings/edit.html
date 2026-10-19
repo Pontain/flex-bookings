@@ -16,6 +16,7 @@
     {% endif %}
 
     <form method="post" class="form-dark">
+<input type="hidden" name="csrf_token" value="{{ request.session.csrf }}">
         <label for="venue_id">Lokal</label>
         <select id="venue_id" name="venue_id" required>
             <option value="">Välj lokal</option>

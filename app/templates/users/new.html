@@ -13,6 +13,7 @@
 
     <div class="content-card">
         <form method="post" action="/users/new" class="form-light booking-form glass">
+<input type="hidden" name="csrf_token" value="{{ request.session.csrf }}">
             <div class="form-group">
                 <label for="full_name">Namn</label>
                 <input type="text" id="full_name" name="full_name" required>

@@ -1,0 +1,1 @@
+{% extends "public_base.html" %}{% block content %}<div class="content-card"><h1>Verifiera e-post</h1><form method="post"><input type="hidden" name="csrf_token" value="{{ request.session.csrf }}"><button type="submit">Verifiera min e-postadress</button></form></div>{% endblock %}

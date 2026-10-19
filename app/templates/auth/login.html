@@ -8,7 +8,7 @@
 
 {% block header %}{% endblock %}
 
-{% block content %}
+{% block content %}<p><a href="/resend-verification">Verifiera e-post / skicka ny länk</a></p>
 <div class="login-page">
     <div class="page-shell">
         <div class="glass-card">
@@ -49,6 +49,7 @@
                 {% endif %}
 
                 <form method="post" action="/login" class="login-form">
+<input type="hidden" name="csrf_token" value="{{ request.session.csrf }}">
                     <label for="email">E-post</label>
                     <input type="email" id="email" name="email" required>
 

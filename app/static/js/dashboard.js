@@ -1,5 +1,7 @@
+function escapeText(value) { const el = document.createElement("span"); el.textContent = value ?? ""; return el.innerHTML; }
 function formatDayLabel(date) {
     return date.toLocaleDateString("sv-SE", {
+        timeZone: "UTC",
         weekday: "long",
         day: "numeric",
         month: "short"
@@ -9,21 +11,22 @@ function formatDayLabel(date) {
 function formatTime(dateString) {
     const d = new Date(dateString);
     return d.toLocaleTimeString("sv-SE", {
+        timeZone: "Europe/Stockholm",
         hour: "2-digit",
         minute: "2-digit"
     });
 }
 
 function formatEventTimeForDay(event, dayDate) {
-    const eventStart = new Date(event.start);
-    const eventEnd = new Date(event.end);
+    const eventStart = swedishClockDate(event.start);
+    const eventEnd = swedishClockDate(event.end);
 
     const dayStart = new Date(dayDate);
-    dayStart.setHours(0, 0, 0, 0);
+    dayStart.setUTCHours(0, 0, 0, 0);
 
     const dayEnd = new Date(dayDate);
-    dayEnd.setDate(dayEnd.getDate() + 1);
-    dayEnd.setHours(0, 0, 0, 0);
+    dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+    dayEnd.setUTCHours(0, 0, 0, 0);
 
     const startsToday = eventStart >= dayStart && eventStart < dayEnd;
     const endsToday = eventEnd > dayStart && eventEnd <= dayEnd;
@@ -116,16 +119,16 @@ function renderDashboardCalendar(startString, events) {
 
     for (let i = 0; i < 7; i++) {
         const dayDate = new Date(weekStart);
-        dayDate.setDate(dayDate.getDate() + i);
+        dayDate.setUTCDate(dayDate.getUTCDate() + i);
 
         const column = document.createElement("div");
         column.className = "dashboard-day";
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const today = swedishClockDate();
+        today.setUTCHours(0, 0, 0, 0);
 
         const currentDay = new Date(dayDate);
-        currentDay.setHours(0, 0, 0, 0);
+        currentDay.setUTCHours(0, 0, 0, 0);
 
         if (currentDay.getTime() === today.getTime()) {
             column.classList.add("today");
@@ -139,16 +142,16 @@ function renderDashboardCalendar(startString, events) {
         body.className = "dashboard-day-body";
 
         const dayStart = new Date(dayDate);
-        dayStart.setHours(0, 0, 0, 0);
+        dayStart.setUTCHours(0, 0, 0, 0);
 
         const dayEnd = new Date(dayDate);
-        dayEnd.setDate(dayEnd.getDate() + 1);
-        dayEnd.setHours(0, 0, 0, 0);
+        dayEnd.setUTCDate(dayEnd.getUTCDate() + 1);
+        dayEnd.setUTCHours(0, 0, 0, 0);
 
         const dayEvents = events
             .filter(event => {
-                const eventStart = new Date(event.start);
-                const eventEnd = new Date(event.end);
+                const eventStart = swedishClockDate(event.start);
+                const eventEnd = swedishClockDate(event.end);
 
                 return eventStart < dayEnd && eventEnd > dayStart;
             })
@@ -171,9 +174,9 @@ function renderDashboardCalendar(startString, events) {
                 }
 
                 card.innerHTML = `
-                    <div class="booking-title">${event.title}</div>
+                    <div class="booking-title">${escapeText(event.title)}</div>
                     <div class="booking-time">${formatEventTimeForDay(event, dayDate)}</div>
-                    <div class="booking-contact">${event.contact_name ?? ""}</div>
+                    <div class="booking-contact">${escapeText(event.contact_name)}</div>
                 `;
 
                 body.appendChild(card);
