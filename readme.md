@@ -1,23 +1,23 @@
 # Flex Bookings
 
-Ett bokningssystem för organisationer som behöver hantera lokaler och gemensamma bokningar. Projektet fokuserar på åtkomstkontroll, e-postverifiering, skydd mot dubbelbokning och korrekt hantering av svenska tider.
+A booking system for organizations that need to manage shared spaces and reservations. The project focuses on access control, email verification, double-booking prevention, and correct handling of Swedish local time.
 
-## Funktioner
+## Features
 
-- Separata organisationer med ägare, administratörer och medlemmar
-- Hantering av lokaler och bokningar
-- E-postverifiering och kontoskydd
-- Databasskydd mot överlappande bokningar
-- Tidszonshantering för Europe/Stockholm
-- API med samma sessions- och CSRF-skydd som webbappen
+- Separate organizations with owners, administrators, and members
+- Venue and booking management
+- Email verification and account protection
+- Database safeguards against overlapping bookings
+- Time zone handling for Europe/Stockholm
+- API with the same session and CSRF protections as the web app
 
-## Teknik
+## Technology
 
-Python, FastAPI, SQLAlchemy, Alembic, PostgreSQL, Redis och pytest.
+Python, FastAPI, SQLAlchemy, Alembic, PostgreSQL, Redis, and pytest.
 
-## Kom igång
+## Getting started
 
-Python 3.12 rekommenderas. I PowerShell från projektroten:
+Python 3.12 is recommended. From the project root, run these commands in PowerShell:
 
 ```powershell
 py -3.12 -m venv .venv
@@ -25,15 +25,15 @@ py -3.12 -m venv .venv
 Copy-Item .env.example .env
 ```
 
-Fyll i de lokala värdena i `.env`. Skapa sedan en ny, tom utvecklingsdatabas och starta appen:
+Set the local values in `.env`. Then create a new, empty development database and start the app:
 
 ```powershell
 .\.venv\Scripts\python.exe -m scripts.migrate
 .\.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8010 --no-access-log
 ```
 
-Öppna http://127.0.0.1:8010. För Linux/macOS använder du `.venv/bin/python` i stället.
+Open http://127.0.0.1:8010. On Linux or macOS, use `.venv/bin/python` instead.
 
-## Dokumentation
+## Documentation
 
-Se [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) för e-postinställningar, migrering av befintliga databaser, produktionskonfiguration, behörigheter och testning. Migreringskommandon för befintliga databaser kräver att du först kontrollerar hur deras gamla tider ska tolkas.
+See [MIGRATION_GUIDE.md](MIGRATION_GUIDE.md) for email settings, migrating existing databases, production configuration, permissions, and testing. Before migrating an existing database, check how its legacy timestamps should be interpreted.
